@@ -82,4 +82,18 @@ Non-Functional:
 •	Unit Tests: Core matching algorithm.
 •	E2E Tests: User journey (signup → session).
 
+Flow Summary
+1.	Registration:
+o	Tutor signs up → Basic profile created with profileCompleted: false
+2.	Profile Completion:
+o	Tutor fills out detailed profile → profileCompleted set to true
+o	Admin notified for verification
+3.	Admin Verification:
+o	Admin reviews credentials
+o	Approves → isVerified: true → Tutor appears in listings
+o	Rejects → Tutor notified to update information
+4.	Student View:
+o	Only tutors with profileCompleted: true AND isVerified: true appear in search results
+
+
 
