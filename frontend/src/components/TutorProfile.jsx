@@ -1,7 +1,6 @@
 import React from 'react';
 
 const TutorProfile = ({ tutor }) => {
-
   const dummyTutor = tutor || {
     id: '123',
     name: 'Mela Alemu',
@@ -30,7 +29,7 @@ const TutorProfile = ({ tutor }) => {
       <div className="flex flex-col md:flex-row items-center md:items-start mb-8">
         <img
           src={dummyTutor.profilePic}
-          alt={${dummyTutor.name}'s profile}
+          alt={`${dummyTutor.name}'s profile`}
           className="w-32 h-32 rounded-full object-cover border-4 border-blue-500 shadow-md mb-4 md:mb-0 md:mr-6"
         />
         <div className="text-center md:text-left">
@@ -50,7 +49,10 @@ const TutorProfile = ({ tutor }) => {
             <span className="text-yellow-500 text-xl mr-2">⭐️</span>
             <span className="text-gray-700 text-lg">
               {dummyTutor.reviews.length > 0
-                ? (dummyTutor.reviews.reduce((sum, r) => sum + r.rating, 0) / dummyTutor.reviews.length).toFixed(1)
+                ? (
+                    dummyTutor.reviews.reduce((sum, r) => sum + r.rating, 0) /
+                    dummyTutor.reviews.length
+                  ).toFixed(1)
                 : 'No ratings yet'}
             </span>
             <span className="text-gray-500 text-md ml-2">({dummyTutor.reviews.length} reviews)</span>
@@ -89,6 +91,7 @@ const TutorProfile = ({ tutor }) => {
         <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Availability</h3>
         <p className="text-gray-700 text-lg">{dummyTutor.availability}</p>
       </div>
+
       <div className="mb-8">
         <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Student Reviews</h3>
         {dummyTutor.reviews.length > 0 ? (
@@ -112,7 +115,6 @@ const TutorProfile = ({ tutor }) => {
         <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
           Book a Session
         </button>
-       
       </div>
     </div>
   );
