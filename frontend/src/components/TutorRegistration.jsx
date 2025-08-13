@@ -1,4 +1,4 @@
-// TutorRegistration.js
+// TutorRegistration.jsx
 
 import React, { useState } from 'react';
 import { addTutorApplication } from './dataStore';
