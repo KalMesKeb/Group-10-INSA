@@ -9,17 +9,15 @@ import TutorProfile from './components/TutorProfile';
 import AuthModal from './components/AuthModal';
 import Login from './pages/Login';
 import Contact from './pages/contact';
-import AboutUs from './pages/about'; 
-import AdminDashboard from './components/AdminDashboard'; 
+import AboutUs from './pages/about';
+import AdminDashboard from './components/AdminDashboard';
 import LiveSessionRoom from './components/LiveSessionRoom';
-import DisputeReport from './components/DisputeReport'; // Correct path to the dispute page
-
-
+import DisputeReport from './components/DisputeReport';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [loggedInUser, setLoggedInUser] = useState(null); // Simulate logged in user
+  const [loggedInUser, setLoggedInUser] = useState(null);
   const [liveRoomId, setLiveRoomId] = useState(null);
 
   const navigate = (page) => {
@@ -29,7 +27,7 @@ function App() {
   const handleAuthSuccess = (user) => {
     setLoggedInUser(user);
     setIsAuthModalOpen(false);
-    
+
     if (user.role === 'admin') {
       navigate('admin-dashboard');
     } else if (user.role === 'tutor') {
@@ -37,8 +35,6 @@ function App() {
     } else {
       navigate('student-dashboard');
     }
-
-
   };
 
   const handleLogout = () => {
@@ -56,11 +52,48 @@ function App() {
     navigate('student-dashboard');
   };
 
-  
+  // This is the new component for controlling access to pages.
+  // It checks if the user is logged in and has one of the allowed roles.
+  const ProtectedWrapper = ({ children, allowedRoles = [] }) => {
+    // Check if a user is logged in.
+    if (!loggedInUser) {
+      return (
+        <div className="flex flex-col items-center justify-center h-screen text-gray-800 p-6 text-center">
+          <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
+          <p className="mb-6">Please log in to view this page.</p>
+          <button
+            onClick={() => navigate('home')}
+            className="px-6 py-2 bg-blue-600 text-white font-medium rounded-full shadow-md hover:bg-blue-700 transition-colors"
+          >
+            Go to Home
+          </button>
+        </div>
+      );
+    }
 
+    // Check if the logged-in user's role is in the list of allowed roles.
+    if (!allowedRoles.includes(loggedInUser.role)) {
+      return (
+        <div className="flex flex-col items-center justify-center h-screen text-gray-800 p-6 text-center">
+          <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
+          <p className="mb-6">You do not have the required permissions to view this page.</p>
+          <button
+            onClick={() => navigate('home')}
+            className="px-6 py-2 bg-blue-600 text-white font-medium rounded-full shadow-md hover:bg-blue-700 transition-colors"
+          >
+            Go to Home
+          </button>
+        </div>
+      );
+    }
+
+    // If both checks pass, render the child components (the page).
+    return children;
+  };
+
+  // The main return block where we render the correct page.
   return (
     <div className="h-screen w-screen flex flex-col bg-white-100">
-      
       <Header
         navigate={navigate}
         onLoginClick={() => setIsAuthModalOpen(true)}
@@ -69,19 +102,53 @@ function App() {
       />
 
       <main className="flex-grow container mx-auto p-4">
+        {/* Public Pages */}
         {currentPage === 'home' && <HomePage navigate={navigate} />}
         {currentPage === 'login' && <Login navigate={navigate} />}
-        {currentPage === 'tutor-register' && <TutorRegistration />}
-        {currentPage === 'student-dashboard' && <StudentDashboard joinLiveSession={joinLiveSession} />}
-        {currentPage === 'tutor-profile' && <TutorProfile />}
         {currentPage === 'contact' && <Contact />}
         {currentPage === 'about' && <AboutUs />}
-        {currentPage === 'admin-dashboard' && <AdminDashboard />}
-        {currentPage === 'live-session' && (
-          <LiveSessionRoom roomId={liveRoomId} onLeave={leaveLiveSession} />
+         {currentPage === 'student-dashboard' && <StudentDashboard />}
+
+        {/* Protected Pages */}
+        {/* Student Pages - Access granted to 'student' role */}
+
+        {currentPage === 'tutor-register' && (
+          <ProtectedWrapper allowedRoles={['tutor']}>
+            <TutorRegistration />
+          </ProtectedWrapper>
         )}
-        {currentPage === 'dispute' && <DisputeReport />} {/* Added the dispute page */}
+
+        {currentPage === 'student-dashboard' && (
+          <ProtectedWrapper allowedRoles={['student']}>
+            <StudentDashboard joinLiveSession={joinLiveSession} />
+          </ProtectedWrapper>
+        )}
+        {currentPage === 'dispute' && (
+          <ProtectedWrapper allowedRoles={['student', 'tutor']}>
+            <DisputeReport />
+          </ProtectedWrapper>
+        )}
+        {currentPage === 'live-session' && (
+          <ProtectedWrapper allowedRoles={['student', 'tutor']}>
+            <LiveSessionRoom roomId={liveRoomId} onLeave={leaveLiveSession} />
+          </ProtectedWrapper>
+        )}
+
+        {/* Tutor Pages - Access granted to 'tutor' role */}
+        {currentPage === 'tutor-profile' && (
+          <ProtectedWrapper allowedRoles={['tutor']}>
+            <TutorProfile />
+          </ProtectedWrapper>
+        )}
+
+        {/* Admin Pages - Access granted to 'admin' role */}
+        {currentPage === 'admin-dashboard' && (
+          <ProtectedWrapper allowedRoles={['admin']}>
+            <AdminDashboard />
+          </ProtectedWrapper>
+        )}
       </main>
+
       <Footer />
 
       {isAuthModalOpen && (

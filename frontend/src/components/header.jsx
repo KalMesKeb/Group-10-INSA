@@ -1,139 +1,226 @@
 import React, { useState } from 'react';
-import { Menu } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import l3 from '../assets/l3.png';
 
 
 const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // Helper function to close the mobile menu after a navigation action
+  const handleNavigate = (page) => {
+    navigate(page);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <header className="absolute top-0 left-0 w-full z-20 p-6 lg:p-8" >
       <nav className="container mx-auto flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center space-x-2">
-         
-           
           <img src={l3} alt="My Photo" className="w-20 h-20 object-cover" />
         </div>
 
         {/* Desktop Navigation links */}
         <div className="hidden lg:flex items-center space-x-8">
-             <button
-          onClick={() => navigate('home')}
-          className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
-        >
-          Home
-        </button>
-            <button
-          onClick={() => navigate('tutor-register')}
-          className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
-        >
-          Become a Tutor
-        </button>
-          
           <button
-          onClick={() => navigate('student-dashboard')} // Will lead to search tutors
-          className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
-        >
-          Find a Tutor
-        </button>
-
-        <button
-          onClick={() => navigate('dispute')} // Will lead to search tutors
-          className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
-        >
-          Report
-        </button>
-
-        <button
-          onClick={() => navigate('about')} // Will lead to search tutors
-          className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
-        >
-          About Us
-        </button>
-
-        <button
-          onClick={() => navigate('contact')} // Will lead to search tutors
-          className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
-        >
-          Contact
-        </button>
-
-          <button
-          onClick={() => navigate('login')}
-          className=" cursor-pointer bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all duration-300">
-            SignUp
+            onClick={() => handleNavigate('home')}
+            className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
+          >
+            Home
           </button>
-      
-      
-    <button
-      onClick={() => navigate('admin-dashboard')}
-      className="hover:text-indigo-600 transition-colors text-lg font-medium"
-    >
-      Admin Dashboard
-     </button>
+
+          {/* Public links visible to everyone */}
+          <button
+            onClick={() => handleNavigate('about')}
+            className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
+          >
+            About Us
+          </button>
+          <button
+            onClick={() => handleNavigate('contact')}
+            className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
+          >
+            Contact
+          </button>
+          <button
+                onClick={() => handleNavigate('student-dashboard')}
+                className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
+              >
+                Find a Tutor
+              </button>
+          
+          {/* Become a Tutor is for non-logged-in users or anyone to see */}
+        
+            
           
 
+          {/* Student-specific links */}
+          {loggedInUser?.role === 'student' && (
+            <>
+              
+              <button
+                onClick={() => handleNavigate('dispute')}
+                className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
+              >
+                Report
+              </button>
+            </>
+          )}
 
+          {/* Admin-specific links */}
+          {loggedInUser?.role === 'admin' && (
+            <button
+              onClick={() => handleNavigate('admin-dashboard')}
+              className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
+            >
+              Admin Dashboard
+            </button>
+          )}
 
+          {/* Tutor-specific link */}
+          {loggedInUser?.role === 'tutor' && (
+
+            <>
+            <button
+              onClick={() => handleNavigate('tutor-profile')}
+              className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
+            >
+              My Profile
+            </button>
+
+              <button
+              onClick={() => handleNavigate('tutor-register')}
+              className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
+            >
+              Become a Tutor
+            </button>
+
+            </>
+            
+          )}
+
+          {/* Conditionally render login/signup or logout */}
+          {loggedInUser ? (
+            <button
+              onClick={onLogout}
+              className="cursor-pointer bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all duration-300"
+            >
+              Logout
+            </button>
+          ) : (
+            <button
+              onClick={onLoginClick}
+              className="cursor-pointer bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all duration-300"
+            >
+              Sign Up / Log In
+            </button>
+          )}
         </div>
         
         {/* Mobile menu button */}
         <div className="lg:hidden">
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-white">
+          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-black">
             {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
       </nav>
 
-      {/* Mobile menu */}
+      {/* Mobile menu overlay */}
       <div
-        className={`fixed top-0 left-0 w-full h-full bg-black bg-opacity-90 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 w-full h-full bg-white transform transition-transform duration-300 ease-in-out ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:hidden`}
+        } lg:hidden flex flex-col items-center justify-center space-y-8`}
       >
-        <div className="flex flex-col items-center justify-center h-full text-white space-y-8">
-          
-          <button
-          onClick={() => navigate('tutor-register')} 
-          className="text-white hover:text-gray-300 transition-colors duration-200"
+        <button
+          onClick={() => handleNavigate('home')}
+          className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
         >
           Home
         </button>
-            <button
-          onClick={() => navigate('home')}
-          className="text-white hover:text-gray-300 transition-colors duration-200"
-        >
-          Become a Tutor
-        </button>
+
+       <button
+              onClick={() => handleNavigate('student-dashboard')}
+              className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
+            >
+              Find a Tutor
+            </button>
           
+       
+
+        {loggedInUser?.role === 'student' && (
+          <>
+            
+            <button
+              onClick={() => handleNavigate('dispute')}
+              className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
+            >
+              Report
+            </button>
+          </>
+        )}
+        
+        {loggedInUser?.role === 'admin' && (
           <button
-          onClick={() => navigate('student-dashboard')} // Will lead to search tutors
-          className="text-white hover:text-gray-300 transition-colors duration-200"
-        >
-          Find a Tutor
-        </button>
+            onClick={() => handleNavigate('admin-dashboard')}
+            className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
+          >
+            Admin Dashboard
+          </button>
+        )}
+
+        {loggedInUser?.role === 'tutor' && (
+
+          <>
+          <button
+            onClick={() => handleNavigate('tutor-profile')}
+            className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
+          >
+            My Profile
+          </button>
+            <button
+            onClick={() => handleNavigate('tutor-register')}
+            className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
+          >
+            Become a Tutor
+          </button>
+
+
+          </>
+          
+
+
+
+        )}
+
         <button
-          onClick={() => navigate('student-dashboard')} // Will lead to search tutors
-          className="text-white hover:text-gray-300 transition-colors duration-200"
+          onClick={() => handleNavigate('about')}
+          className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
         >
           About Us
         </button>
 
         <button
-          onClick={() => navigate('student-dashboard')} // Will lead to search tutors
-          className="text-white hover:text-gray-300 transition-colors duration-200"
+          onClick={() => handleNavigate('contact')}
+          className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
         >
           Contact
         </button>
 
-          <button className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all duration-300">
-            SignUp
+        {loggedInUser ? (
+          <button
+            onClick={onLogout}
+            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all duration-300"
+          >
+            Logout
           </button>
-
-          
-        </div>
+        ) : (
+          <button
+            onClick={onLoginClick}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all duration-300"
+          >
+            Sign Up / Log In
+          </button>
+        )}
       </div>
     </header>
   );

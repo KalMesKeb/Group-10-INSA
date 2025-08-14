@@ -63,7 +63,7 @@ const [searchQuery, setSearchQuery] = useState('');
           Unlock Your Potential with Personalized Tutoring
         </h2>
         {/* Call to action button */}
-        <button  onClick={() => navigate('login')}
+        <button  onClick={() => navigate('AuthModal')}
           className=" cursor-pointer bg-white-500 text-white-600 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-200 transition-all duration-300">
           Get Started
         </button>
