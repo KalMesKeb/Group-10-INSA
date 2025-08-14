@@ -62,10 +62,10 @@ function App() {
           <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
           <p className="mb-6">Please log in to view this page.</p>
           <button
-            onClick={() => navigate('home')}
+            onClick={() => setIsAuthModalOpen(true)}
             className="px-6 py-2 bg-blue-600 text-white font-medium rounded-full shadow-md hover:bg-blue-700 transition-colors"
           >
-            Go to Home
+            Log In
           </button>
         </div>
       );
@@ -107,41 +107,44 @@ function App() {
         {currentPage === 'login' && <Login navigate={navigate} />}
         {currentPage === 'contact' && <Contact />}
         {currentPage === 'about' && <AboutUs />}
-         {currentPage === 'student-dashboard' && <StudentDashboard />}
+        {currentPage === 'student-dashboard' && (
+          <StudentDashboard
+            joinLiveSession={joinLiveSession}
+            loggedInUser={loggedInUser}
+            onLoginClick={() => setIsAuthModalOpen(true)}
+          />
+        )}
 
         {/* Protected Pages */}
-        {/* Student Pages - Access granted to 'student' role */}
-
+        {/* Tutor Registration */}
         {currentPage === 'tutor-register' && (
           <ProtectedWrapper allowedRoles={['tutor']}>
             <TutorRegistration />
           </ProtectedWrapper>
         )}
 
-        {currentPage === 'student-dashboard' && (
-          <ProtectedWrapper allowedRoles={['student']}>
-            <StudentDashboard joinLiveSession={joinLiveSession} />
-          </ProtectedWrapper>
-        )}
+        {/* Dispute Reporting */}
         {currentPage === 'dispute' && (
           <ProtectedWrapper allowedRoles={['student', 'tutor']}>
-            <DisputeReport />
+            <DisputeReport loggedInUser={loggedInUser} />
           </ProtectedWrapper>
         )}
+
+        {/* Live Session Room */}
         {currentPage === 'live-session' && (
           <ProtectedWrapper allowedRoles={['student', 'tutor']}>
             <LiveSessionRoom roomId={liveRoomId} onLeave={leaveLiveSession} />
           </ProtectedWrapper>
         )}
 
-        {/* Tutor Pages - Access granted to 'tutor' role */}
+        {/* Tutor Profile */}
         {currentPage === 'tutor-profile' && (
           <ProtectedWrapper allowedRoles={['tutor']}>
             <TutorProfile />
           </ProtectedWrapper>
         )}
 
-        {/* Admin Pages - Access granted to 'admin' role */}
+        {/* Admin Dashboard */}
         {currentPage === 'admin-dashboard' && (
           <ProtectedWrapper allowedRoles={['admin']}>
             <AdminDashboard />

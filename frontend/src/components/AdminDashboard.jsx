@@ -1,22 +1,22 @@
-
-
 import React, { useState, useEffect } from 'react';
-import { tutorApplications, userAccounts, disputes, approveTutor, rejectTutor } from './dataStore';
+import { tutorApplications, userAccounts, disputes, approveTutor, rejectTutor, bookedSessions } from './dataStore';
 
 const AdminDashboard = () => {
     const [tutorApplicationsState, setTutorApplicationsState] = useState(tutorApplications);
     const [disputesState, setDisputesState] = useState(disputes);
     const [userAccountsState, setUserAccountsState] = useState(userAccounts);
     const [selectedApplication, setSelectedApplication] = useState(null);
+    const [bookedSessionsState, setBookedSessionsState] = useState(bookedSessions);
 
     useEffect(() => {
         setTutorApplicationsState([...tutorApplications]);
         setUserAccountsState([...userAccounts]);
         setDisputesState([...disputes]);
-    }, [tutorApplications, userAccounts, disputes]);
+        setBookedSessionsState([...bookedSessions]);
+    }, [tutorApplications, userAccounts, disputes, bookedSessions]);
 
     const handleApprove = (id) => {
-        approveTutor(id); // Use the new function from dataStore
+        approveTutor(id);
         setTutorApplicationsState([...tutorApplications]);
         setUserAccountsState([...userAccounts]);
         setSelectedApplication(null);
@@ -60,6 +60,29 @@ const AdminDashboard = () => {
         <div className="max-w-7xl mx-auto py-12 px-4 mt-24">
             <h1 className="text-5xl font-extrabold text-center text-gray-900 mb-12">Admin Dashboard ⚙️</h1>
 
+            {/* NEW: Section for Booked Sessions */}
+            <div className={listContainerStyle}>
+                <h2 className={sectionTitleStyle}>Booked Sessions ({bookedSessionsState.length})</h2>
+                {bookedSessionsState.length > 0 ? (
+                    <ul className="divide-y divide-gray-200">
+                        {bookedSessionsState.map((session, index) => (
+                            <li key={index} className={itemStyle}>
+                                <div>
+                                    <p className="font-semibold text-lg">Session with {session.tutorName}</p>
+                                    <p className="text-sm text-gray-600">Student: {session.studentName}</p>
+                                    <p className="text-sm text-gray-500">Subject: {session.subject}</p>
+                                    <p className="text-sm text-gray-500">Date: {session.date} at {session.time}</p>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="text-gray-500 text-center py-4">No sessions have been booked yet.</p>
+                )}
+            </div>
+
+            <hr className="my-12 border-gray-300" />
+            
             <div className={listContainerStyle}>
                 <h2 className={sectionTitleStyle}>Tutor Applications ({tutorApplicationsState.length})</h2>
                 {selectedApplication ? (
@@ -113,6 +136,8 @@ const AdminDashboard = () => {
                 )}
             </div>
 
+            <hr className="my-12 border-gray-300" />
+
             <div className={listContainerStyle}>
                 <h2 className={sectionTitleStyle}>Disputes ({disputesState.length})</h2>
                 {disputesState.length > 0 ? (
@@ -132,6 +157,8 @@ const AdminDashboard = () => {
                     <p className="text-gray-500 text-center py-4">No open disputes at this time.</p>
                 )}
             </div>
+
+            <hr className="my-12 border-gray-300" />
 
             <div className={listContainerStyle}>
                 <h2 className={sectionTitleStyle}>User Accounts ({userAccountsState.length})</h2>
