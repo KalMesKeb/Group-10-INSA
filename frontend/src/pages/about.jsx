@@ -1,5 +1,5 @@
 import React from 'react';
-import a3 from '../assete/a3.jpeg';
+import a3 from '../assets/a3.jpeg';
 
 // The About Us page component, styled to match the provided landing page image.
 const AboutUs = () => {

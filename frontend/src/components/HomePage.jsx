@@ -1,7 +1,7 @@
-
+// src/components/HomePage.jsx
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import myPhoto from '../assets/back1.jpeg';
+import myPhoto from '../assets/bg41.jpeg';
 
 
 const HomePage = ({ navigate }) => {
@@ -9,7 +9,7 @@ const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearch = (e) => {
     e.preventDefault();
-  
+    // In a real app, you would handle the search logic here
     console.log('Searching for:', searchQuery);
   };
   return (
@@ -23,21 +23,21 @@ const [searchQuery, setSearchQuery] = useState('');
       </p>
 
         <section className="relative h-[100vh] flex items-center justify-center text-white">
-    
+      {/* Background image overlay */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-     
+        // style={{ backgroundImage: "url('/images/myphoto.jpg')" }}
       >
         
-
+        {/* <div className="absolute inset-0 bg-black opacity-50"></div> */}
       </div>
 
-      <div className="relative z-10 text-center p-4">
-      
+      <div className="relative z-10 text-center p-4 -mt-60">
+        {/* Main heading */}
         <h1 className="text-4xl lg:text-5xl font-extrabold mb-4 drop-shadow-lg">
           Find Your Perfect Tutor
         </h1>
-      
+        {/* Search form */}
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="relative w-full sm:w-80">
             <input
@@ -45,7 +45,7 @@ const [searchQuery, setSearchQuery] = useState('');
               placeholder="Subjects or Keywords"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-black w-full py-3 px-5 pr-10 rounded-full text-white-800 placeholder-white-1000 shadow-md focus:outline-none focus:ring-2 focus:ring-white-500"
+              className="bg-white w-full py-3 px-5 pr-10 rounded-full text-gray-800 placeholder-gray-1000 shadow-md focus:outline-none focus:ring-2 focus:ring-black-500"
             />
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
           </div>
@@ -58,19 +58,20 @@ const [searchQuery, setSearchQuery] = useState('');
           </button>
         </form>
 
-    
+       
         <h2 className="text-3xl lg:text-4xl font-extrabold mt-12 mb-6 drop-shadow-lg">
           Unlock Your Potential with Personalized Tutoring
         </h2>
-        
+        {/* Call to action button */}
         <button  onClick={() => navigate('login')}
-          className=" cursor-pointer bg-white text-emerald-600 font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-gray-200 transition-all duration-300">
+          className=" cursor-pointer bg-white-500 text-white-600 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-200 transition-all duration-300">
           Get Started
         </button>
       </div>
     </section>
 
       <div className="flex justify-center space-x-6" mx-auto>
+        
         <button
           onClick={() => navigate('student-dashboard')} 
           className=" cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"

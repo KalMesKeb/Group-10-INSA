@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import fi1 from '../assete/fi1.jpeg';
+import fi1 from '../assets/fi1.jpeg';
 
 
 // The main App component handles the state and rendering of the forms.

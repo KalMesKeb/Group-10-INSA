@@ -1,4 +1,4 @@
-// AdminDashboard.js
+
 
 import React, { useState, useEffect } from 'react';
 import { tutorApplications, userAccounts, disputes, approveTutor, rejectTutor } from './dataStore';
