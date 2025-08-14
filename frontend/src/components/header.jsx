@@ -211,6 +211,7 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
             onClick={onLogout}
             className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all duration-300"
           >
+            
             Logout
           </button>
         ) : (
