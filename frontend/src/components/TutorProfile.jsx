@@ -17,15 +17,14 @@ const TutorProfile = ({ tutor }) => {
       { role: 'University Lecturer (TA)', company: 'University of Cambridge (3 years)' },
     ],
     reviews: [
-      { student: 'Alice B.', rating: 5, comment: 'Dr. Watson made calculus fun! Highly recommend.' },
-      { student: 'John D.', rating: 4, comment: 'Very knowledgeable and patient. Helped me understand complex topics.' },
+      { student: 'Beza S.', rating: 5, comment: 'Dr. Tomas dgeable and patient. Helped me understand complex topics.' },
     ],
     availability: 'Mon-Fri: 4 PM - 8 PM, Sat: 10 AM - 2 PM',
     isVerified: true,
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl p-8 my-8">
+    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl p-8  my-30">
       <div className="flex flex-col md:flex-row items-center md:items-start mb-8">
         <img
           src={dummyTutor.profilePic}
@@ -111,11 +110,7 @@ const TutorProfile = ({ tutor }) => {
         )}
       </div>
 
-      <div className="text-center mt-10">
-        <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
-          Book a Session
-        </button>
-      </div>
+      
     </div>
   );
 };

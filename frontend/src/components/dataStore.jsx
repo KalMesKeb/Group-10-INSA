@@ -1,8 +1,8 @@
 export const tutorApplications = [
     {
         id: 'app1',
-        name: 'John Doe',
-        email: 'john.doe@example.com',
+        name: 'mentesnot assefa',
+        email: 'mentu@example.com',
         subjects: ['Math', 'Physics'],
         status: 'Pending',
         profileData: {
@@ -17,8 +17,8 @@ export const tutorApplications = [
     },
     {
         id: 'app2',
-        name: 'Jane Smith',
-        email: 'jane.smith@example.com',
+        name: 'beza shola',
+        email: 'bezashola@example.com',
         subjects: ['English', 'Literature'],
         status: 'Pending',
         profileData: {
