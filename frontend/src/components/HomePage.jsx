@@ -64,7 +64,7 @@ const [searchQuery, setSearchQuery] = useState('');
         </h2>
         {/* Call to action button */}
         <button  onClick={() => navigate('AuthModal')}
-          className=" cursor-pointer bg-white-500 text-white-600 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-200 transition-all duration-300">
+          className="cursor-pointer bg-green-600 text-white-600 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-200 transition-all duration-300">
           Get Started
         </button>
       </div>

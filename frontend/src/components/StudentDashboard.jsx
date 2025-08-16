@@ -113,7 +113,7 @@ const StudentDashboard = ({ loggedInUser, joinLiveSession, onLoginClick }) => {
 
     return (
         <div className="max-w-7xl mx-auto py-12 px-4 mt-24">
-            <h1 className="text-5xl font-extrabold text-center text-gray-900 mb-12">Student Dashboard</h1>
+          
 
             {/* Booked Sessions Section */}
             <div className={listContainerStyle}>

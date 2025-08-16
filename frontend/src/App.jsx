@@ -68,13 +68,13 @@ function App() {
     if (!loggedInUser) {
       return (
         <div className="flex flex-col items-center justify-center h-screen text-gray-800 p-6 text-center">
-          <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
-          <p className="mb-6">Please log in to view this page.</p>
+          
+          <p className="mb-6">Please first Register to Become a tutor</p>
           <button
             onClick={() => setIsAuthModalOpen(true)}
-            className="px-6 py-2 bg-blue-600 text-white font-medium rounded-full shadow-md hover:bg-blue-700 transition-colors"
+            className="cursor-pointer px-6 py-2 bg-green-600 text-white font-medium rounded-full shadow-md hover:bg-green-700 transition-colors"
           >
-            Log In
+            Register
           </button>
         </div>
       );
@@ -112,7 +112,12 @@ function App() {
 
       <main className="flex-grow container mx-auto p-4">
         {/* Public Pages */}
-        {currentPage === 'home' && <HomePage navigate={navigate} />}
+        {currentPage === 'home' && <HomePage navigate={navigate} 
+         onLoginClick={() => setIsAuthModalOpen(true)}
+          loggedInUser={loggedInUser}
+        onLogout={handleLogout}
+        
+        />}
         {currentPage === 'login' && <Login navigate={navigate} />}
         {currentPage === 'contact' && <Contact />}
         {currentPage === 'about' && <AboutUs />}
