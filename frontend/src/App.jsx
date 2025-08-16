@@ -1,4 +1,5 @@
 // src/App.jsx
+
 import React, { useState } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -19,6 +20,8 @@ function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [liveRoomId, setLiveRoomId] = useState(null);
+  // NEW: State to hold the registered tutor's profile data
+  const [tutorProfileData, setTutorProfileData] = useState(null);
 
   const navigate = (page) => {
     setCurrentPage(page);
@@ -31,10 +34,19 @@ function App() {
     if (user.role === 'admin') {
       navigate('admin-dashboard');
     } else if (user.role === 'tutor') {
+      // NOTE: We'll update this logic later to handle pre-filled profiles
       navigate('tutor-profile');
     } else {
       navigate('student-dashboard');
     }
+  };
+
+  // NEW: Function to handle a successful tutor registration
+  const handleTutorRegistrationSuccess = (profileData) => {
+    // Save the submitted profile data to state
+    setTutorProfileData(profileData);
+    // Navigate the user to their profile page
+    navigate('tutor-profile');
   };
 
   const handleLogout = () => {
@@ -107,19 +119,25 @@ function App() {
         {currentPage === 'login' && <Login navigate={navigate} />}
         {currentPage === 'contact' && <Contact />}
         {currentPage === 'about' && <AboutUs />}
+
         {currentPage === 'student-dashboard' && (
-          <StudentDashboard
+          <ProtectedWrapper allowedRoles={['student']}>
+
+            <StudentDashboard
             joinLiveSession={joinLiveSession}
             loggedInUser={loggedInUser}
             onLoginClick={() => setIsAuthModalOpen(true)}
           />
+          </ProtectedWrapper>
+          
         )}
 
         {/* Protected Pages */}
         {/* Tutor Registration */}
         {currentPage === 'tutor-register' && (
           <ProtectedWrapper allowedRoles={['tutor']}>
-            <TutorRegistration />
+            {/* UPDATED: Pass the new callback function as a prop */}
+            <TutorRegistration onRegistrationSuccess={handleTutorRegistrationSuccess} />
           </ProtectedWrapper>
         )}
 
@@ -140,7 +158,8 @@ function App() {
         {/* Tutor Profile */}
         {currentPage === 'tutor-profile' && (
           <ProtectedWrapper allowedRoles={['tutor']}>
-            <TutorProfile />
+            {/* UPDATED: Pass the profile data from state as a prop */}
+            <TutorProfile profileData={tutorProfileData} />
           </ProtectedWrapper>
         )}
 

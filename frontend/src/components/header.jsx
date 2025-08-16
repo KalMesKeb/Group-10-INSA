@@ -42,12 +42,7 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
           >
             Contact
           </button>
-          <button
-                onClick={() => handleNavigate('student-dashboard')}
-                className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
-              >
-                Find a Tutor
-              </button>
+          
           
           {/* Become a Tutor is for non-logged-in users or anyone to see */}
         
@@ -57,6 +52,13 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
           {/* Student-specific links */}
           {loggedInUser?.role === 'student' && (
             <>
+              <button
+                onClick={() => handleNavigate('student-dashboard')}
+                className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
+              >
+                Find a Tutor
+              </button>
+
               
               <button
                 onClick={() => handleNavigate('dispute')}
@@ -138,18 +140,20 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
           Home
         </button>
 
-       <button
-              onClick={() => handleNavigate('student-dashboard')}
-              className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
-            >
-              Find a Tutor
-            </button>
+       
           
        
 
         {loggedInUser?.role === 'student' && (
           <>
             
+            <button
+              onClick={() => handleNavigate('student-dashboard')}
+              className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
+            >
+              Find a Tutor
+            </button>
+
             <button
               onClick={() => handleNavigate('dispute')}
               className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
