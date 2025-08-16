@@ -73,7 +73,7 @@ const [searchQuery, setSearchQuery] = useState('');
       <div className="flex justify-center space-x-6" mx-auto>
         
         <button
-          onClick={() => navigate('student-dashboard')} 
+          onClick={() => navigate('tutor-list')} 
           className=" cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"
         >
           Find a Tutor

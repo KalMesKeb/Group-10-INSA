@@ -1,3 +1,5 @@
+// src/components/Header.jsx
+
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import l3 from '../assets/l3.png';
@@ -31,6 +33,12 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
 
           {/* Public links visible to everyone */}
           <button
+            onClick={() => handleNavigate('tutor-list')}
+            className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
+          >
+            Find a Tutor
+          </button>
+          <button
             onClick={() => handleNavigate('about')}
             className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
           >
@@ -43,10 +51,7 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
             Contact
           </button>
           
-          
           {/* Become a Tutor is for non-logged-in users or anyone to see */}
-        
-            
           
 
           {/* Student-specific links */}
@@ -56,10 +61,9 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
                 onClick={() => handleNavigate('student-dashboard')}
                 className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
               >
-                Find a Tutor
+                Dashboard
               </button>
 
-              
               <button
                 onClick={() => handleNavigate('dispute')}
                 className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
@@ -82,23 +86,24 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
           {/* Tutor-specific link */}
           {loggedInUser?.role === 'tutor' && (
 
-            <>
-            <button
+
+              <>
+<button
+              onClick={() => handleNavigate('tutor-register')}
+              className="cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
+            >
+              Become a Tutor
+            </button>
+
+               <button
               onClick={() => handleNavigate('tutor-profile')}
               className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
             >
               My Profile
             </button>
-
-              <button
-              onClick={() => handleNavigate('tutor-register')}
-              className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
-            >
-              Become a Tutor
-            </button>
-
-            </>
-            
+              
+              </>
+           
           )}
 
           {/* Conditionally render login/signup or logout */}
@@ -139,19 +144,22 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
         >
           Home
         </button>
+        
+        <button
+          onClick={() => handleNavigate('tutor-list')}
+          className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
+        >
+          Find a Tutor
+        </button>
 
-       
-          
-       
-
+        
         {loggedInUser?.role === 'student' && (
           <>
-            
             <button
               onClick={() => handleNavigate('student-dashboard')}
               className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
             >
-              Find a Tutor
+              Dashboard
             </button>
 
             <button
@@ -174,26 +182,24 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
 
         {loggedInUser?.role === 'tutor' && (
 
-          <>
-          <button
-            onClick={() => handleNavigate('tutor-profile')}
-            className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
-          >
-            My Profile
-          </button>
+            <>
+
             <button
             onClick={() => handleNavigate('tutor-register')}
             className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
           >
             Become a Tutor
           </button>
+            <button
+            onClick={() => handleNavigate('tutor-profile')}
+            className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
+          >
+            My Profile
+          </button>
+            
+            </>
 
-
-          </>
           
-
-
-
         )}
 
         <button
@@ -215,7 +221,6 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
             onClick={onLogout}
             className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all duration-300"
           >
-            
             Logout
           </button>
         ) : (

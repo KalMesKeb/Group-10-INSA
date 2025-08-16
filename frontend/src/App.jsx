@@ -14,13 +14,13 @@ import AboutUs from './pages/about';
 import AdminDashboard from './components/AdminDashboard';
 import LiveSessionRoom from './components/LiveSessionRoom';
 import DisputeReport from './components/DisputeReport';
+import TutorList from './components/TutorList'; // Import the TutorList component
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [liveRoomId, setLiveRoomId] = useState(null);
-  // NEW: State to hold the registered tutor's profile data
   const [tutorProfileData, setTutorProfileData] = useState(null);
 
   const navigate = (page) => {
@@ -41,11 +41,8 @@ function App() {
     }
   };
 
-  // NEW: Function to handle a successful tutor registration
   const handleTutorRegistrationSuccess = (profileData) => {
-    // Save the submitted profile data to state
     setTutorProfileData(profileData);
-    // Navigate the user to their profile page
     navigate('tutor-profile');
   };
 
@@ -119,17 +116,16 @@ function App() {
         {currentPage === 'login' && <Login navigate={navigate} />}
         {currentPage === 'contact' && <Contact />}
         {currentPage === 'about' && <AboutUs />}
+        {currentPage === 'tutor-list' && <TutorList />} {/* TutorList is now a public page */}
 
         {currentPage === 'student-dashboard' && (
           <ProtectedWrapper allowedRoles={['student']}>
-
             <StudentDashboard
-            joinLiveSession={joinLiveSession}
-            loggedInUser={loggedInUser}
-            onLoginClick={() => setIsAuthModalOpen(true)}
-          />
+              joinLiveSession={joinLiveSession}
+              loggedInUser={loggedInUser}
+              onLoginClick={() => setIsAuthModalOpen(true)}
+            />
           </ProtectedWrapper>
-          
         )}
 
         {/* Protected Pages */}
