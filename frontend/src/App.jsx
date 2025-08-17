@@ -14,7 +14,8 @@ import AboutUs from './pages/about';
 import AdminDashboard from './components/AdminDashboard';
 import LiveSessionRoom from './components/LiveSessionRoom';
 import DisputeReport from './components/DisputeReport';
-import TutorList from './components/TutorList'; // Import the TutorList component
+import TutorList from './components/TutorList';
+import TutorDashboard from './components/TutorDashboard'; // Import the new TutorDashboard component
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -34,8 +35,8 @@ function App() {
     if (user.role === 'admin') {
       navigate('admin-dashboard');
     } else if (user.role === 'tutor') {
-      // NOTE: We'll update this logic later to handle pre-filled profiles
-      navigate('tutor-profile');
+      // Direct tutors to their new dashboard after successful login
+      navigate('tutor-dashboard');
     } else {
       navigate('student-dashboard');
     }
@@ -58,7 +59,13 @@ function App() {
 
   const leaveLiveSession = () => {
     setLiveRoomId(null);
-    navigate('student-dashboard');
+    if (loggedInUser.role === 'student') {
+        navigate('student-dashboard');
+    } else if (loggedInUser.role === 'tutor') {
+        navigate('tutor-dashboard');
+    } else {
+        navigate('home');
+    }
   };
 
   // This is the new component for controlling access to pages.
@@ -113,7 +120,7 @@ function App() {
       <main className="flex-grow container mx-auto p-4">
         {/* Public Pages */}
         {currentPage === 'home' && <HomePage navigate={navigate} 
-         onLoginClick={() => setIsAuthModalOpen(true)}
+          onLoginClick={() => setIsAuthModalOpen(true)}
           loggedInUser={loggedInUser}
         onLogout={handleLogout}
         
@@ -139,6 +146,16 @@ function App() {
           <ProtectedWrapper allowedRoles={['tutor']}>
             {/* UPDATED: Pass the new callback function as a prop */}
             <TutorRegistration onRegistrationSuccess={handleTutorRegistrationSuccess} />
+          </ProtectedWrapper>
+        )}
+        
+        {/* Tutor Dashboard */}
+        {currentPage === 'tutor-dashboard' && (
+          <ProtectedWrapper allowedRoles={['tutor']}>
+            <TutorDashboard
+              loggedInUser={loggedInUser}
+              joinLiveSession={joinLiveSession}
+            />
           </ProtectedWrapper>
         )}
 

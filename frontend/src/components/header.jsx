@@ -38,6 +38,9 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
           >
             Find a Tutor
           </button>
+          
+        
+        
           <button
             onClick={() => handleNavigate('about')}
             className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
@@ -51,9 +54,6 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
             Contact
           </button>
           
-          {/* Become a Tutor is for non-logged-in users or anyone to see */}
-          
-
           {/* Student-specific links */}
           {loggedInUser?.role === 'student' && (
             <>
@@ -83,27 +83,30 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
             </button>
           )}
 
-          {/* Tutor-specific link */}
+          {/* Tutor-specific links */}
           {loggedInUser?.role === 'tutor' && (
+            <>
 
-
-              <>
-<button
+             <button
               onClick={() => handleNavigate('tutor-register')}
               className="cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
             >
               Become a Tutor
             </button>
+              <button
+                onClick={() => handleNavigate('tutor-dashboard')}
+                className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
+              >
+                Dashboard
+              </button>
 
-               <button
-              onClick={() => handleNavigate('tutor-profile')}
-              className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
-            >
-              My Profile
-            </button>
-              
-              </>
-           
+              <button
+                onClick={() => handleNavigate('tutor-profile')}
+                className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
+              >
+                My Profile
+              </button>
+            </>
           )}
 
           {/* Conditionally render login/signup or logout */}
@@ -152,6 +155,7 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
           Find a Tutor
         </button>
 
+     
         
         {loggedInUser?.role === 'student' && (
           <>
@@ -181,25 +185,26 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
         )}
 
         {loggedInUser?.role === 'tutor' && (
-
-            <>
-
-            <button
+          <>
+          <button
             onClick={() => handleNavigate('tutor-register')}
             className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
           >
             Become a Tutor
           </button>
             <button
-            onClick={() => handleNavigate('tutor-profile')}
-            className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
-          >
-            My Profile
-          </button>
-            
-            </>
-
-          
+              onClick={() => handleNavigate('tutor-dashboard')}
+              className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
+            >
+              Dashboard
+            </button>
+            <button
+              onClick={() => handleNavigate('tutor-profile')}
+              className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
+            >
+              My Profile
+            </button>
+          </>
         )}
 
         <button
