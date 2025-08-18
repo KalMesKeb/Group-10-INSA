@@ -163,7 +163,7 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
             case 2:
                 return (
                     <div className="bg-white p-10 rounded-xl shadow-lg border border-gray-200">
-                        <h3 className="text-3xl font-bold mb-8 text-indigo-700">2. Credentials & Experience 📚</h3>
+                        <h3 className="text-3xl font-bold mb-8 text-indigo-700">2. Credentials & Experience </h3>
 
                         <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
                             <h4 className="text-xl font-semibold mb-4 text-gray-800">Educational Credentials<span className="text-red-500">*</span></h4>
@@ -214,7 +214,7 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
             case 3:
                 return (
                     <div className="bg-white p-10 rounded-xl shadow-lg border border-gray-200">
-                        <h3 className="text-3xl font-bold mb-8 text-indigo-700">3. Subjects, Pricing & Availability 🗓️</h3>
+                        <h3 className="text-3xl font-bold mb-8 text-indigo-700">3. Subjects, Pricing & Availability </h3>
 
                         <div className="mb-8">
                             <label className={labelStyle}>Subjects You Teach<span className="text-red-500">*</span></label>
