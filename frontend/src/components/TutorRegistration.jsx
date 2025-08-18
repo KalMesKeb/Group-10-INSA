@@ -121,7 +121,7 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
             case 1:
                 return (
                     <div className="bg-white p-10 rounded-xl shadow-lg border border-gray-200">
-                        <h3 className="text-3xl font-bold mb-8 text-indigo-700">1. Personal Details 👤</h3>
+                        <h3 className="text-3xl font-bold mb-8 text-indigo-700">1. Personal Details</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
                                 <label className={labelStyle} htmlFor="name">Full Name<span className="text-red-500">*</span></label>
@@ -259,7 +259,7 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
             case 4:
                 return (
                     <div className="bg-white p-10 rounded-xl shadow-lg border border-gray-200">
-                        <h3 className="text-3xl font-bold mb-8 text-indigo-700">4. Bio & Profile Picture ✨</h3>
+                        <h3 className="text-3xl font-bold mb-8 text-indigo-700">4. Bio & Profile Picture </h3>
 
                         <div className="mb-8">
                             <label className={labelStyle} htmlFor="bio">Short Bio / Teaching Philosophy<span className="text-red-500">*</span></label>
@@ -289,7 +289,7 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
             case 5:
                 return (
                     <div className="bg-white p-10 rounded-xl shadow-lg border border-gray-200">
-                        <h3 className="text-3xl font-bold mb-8 text-indigo-700">5. Demo Video 🎬</h3>
+                        <h3 className="text-3xl font-bold mb-8 text-indigo-700">5. Demo Video </h3>
                         <div className="mb-8">
                             <label className={labelStyle} htmlFor="demoVideo">
                                 1-Minute Self-Introduction Video<span className="text-red-500">*</span>
