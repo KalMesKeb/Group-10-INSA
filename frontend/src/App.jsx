@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './components/HomePage';
@@ -19,6 +19,40 @@ function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [liveRoomId, setLiveRoomId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Check for existing session on app load
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch('/api/auth/me', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.user) {
+            setLoggedInUser(data.user);
+            // Navigate to appropriate dashboard based on role
+            if (data.user.role === 'admin') {
+              setCurrentPage('admin-dashboard');
+            } else if (data.user.role === 'tutor') {
+              setCurrentPage('tutor-profile');
+            } else {
+              setCurrentPage('student-dashboard');
+            }
+          }
+        }
+      } catch (error) {
+        console.log('No active session');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    checkSession();
+  }, []);
 
   const navigate = (page) => {
     setCurrentPage(page);
@@ -91,6 +125,15 @@ function App() {
     return children;
   };
 
+  // Show loading spinner while checking session
+  if (isLoading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   // The main return block where we render the correct page.
   return (
     <div className="h-screen w-screen flex flex-col bg-white-100">
@@ -140,7 +183,7 @@ function App() {
         {/* Tutor Profile */}
         {currentPage === 'tutor-profile' && (
           <ProtectedWrapper allowedRoles={['tutor']}>
-            <TutorProfile />
+            <TutorProfile tutor={loggedInUser} />
           </ProtectedWrapper>
         )}
 

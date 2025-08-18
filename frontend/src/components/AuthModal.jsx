@@ -9,6 +9,7 @@ const AuthModal = ({ onAuthSuccess, onClose }) => {
   // and the current role ('student', 'tutor', or 'admin').
   const [currentForm, setCurrentForm] = useState('login');
   const [currentRole, setCurrentRole] = useState(null);
+  const [registeredEmail, setRegisteredEmail] = useState('');
 
   // A component to render the role selection screen.
   const RoleSelection = () => (
@@ -107,76 +108,364 @@ const AuthModal = ({ onAuthSuccess, onClose }) => {
   };
 
   // A component for Student Signup. It includes a specific field for grade level.
-  const StudentSignupForm = () => (
-    <form className="space-y-6">
-      <h2 className="text-3xl font-bold text-gray-800 mb-2">Student Sign Up</h2>
-      <p className="text-gray-500 mb-6">Join us to start learning!</p>
-      <div>
-        <label htmlFor="student-signup-name" className="block text-sm font-medium text-gray-700">Full Name</label>
-        <input type="text" id="student-signup-name" className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" placeholder="John Doe" required />
-      </div>
-      <div>
-        <label htmlFor="student-signup-email" className="block text-sm font-medium text-gray-700">Email Address</label>
-        <input type="email" id="student-signup-email" className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" placeholder="you@example.com" required />
-      </div>
-      <div>
-        <label htmlFor="student-signup-password" className="block text-sm font-medium text-gray-700">Password</label>
-        <input type="password" id="student-signup-password" className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" placeholder="********" required />
-      </div>
-      <div>
-        <label htmlFor="student-signup-grade" className="block text-sm font-medium text-gray-700">Grade Level</label>
-        <input type="text" id="student-signup-grade" className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" placeholder="e.g., 10th Grade" />
-      </div>
-      <div>
-        <button type="submit" className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-bold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150">
-          Sign Up as Student
-        </button>
-      </div>
-      <div className="text-center text-sm">
-        <span className="text-gray-600">Already have an account?</span>
-        <a href="#" onClick={() => setCurrentForm('login')} className="font-medium text-blue-600 hover:text-blue-500 ml-1 transition duration-150">Login</a>
-      </div>
-      <div className="text-center text-sm">
-        <a href="#" onClick={() => setCurrentRole(null)} className="font-medium text-gray-600 hover:text-gray-800 ml-1 transition duration-150">Change Role</a>
-      </div>
-    </form>
-  );
+  const StudentSignupForm = () => {
+    const [formData, setFormData] = useState({
+      name: '',
+      email: '',
+      password: '',
+      gradeLevel: ''
+    });
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleInputChange = (e) => {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value
+      });
+    };
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setIsLoading(true);
+      setError('');
+
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            role: 'student',
+            gradeLevel: formData.gradeLevel
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setRegisteredEmail(formData.email);
+          setCurrentForm('verify');
+        } else {
+          setError(data.message || 'Registration failed');
+        }
+      } catch (err) {
+        setError('Network error. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    return (
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <h2 className="text-3xl font-bold text-gray-800 mb-2">Student Sign Up</h2>
+        <p className="text-gray-500 mb-6">Join us to start learning!</p>
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            {error}
+          </div>
+        )}
+        <div>
+          <label htmlFor="student-signup-name" className="block text-sm font-medium text-gray-700">Full Name</label>
+          <input 
+            type="text" 
+            id="student-signup-name" 
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" 
+            placeholder="John Doe" 
+            required 
+          />
+        </div>
+        <div>
+          <label htmlFor="student-signup-email" className="block text-sm font-medium text-gray-700">Email Address</label>
+          <input 
+            type="email" 
+            id="student-signup-email" 
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" 
+            placeholder="you@example.com" 
+            required 
+          />
+        </div>
+        <div>
+          <label htmlFor="student-signup-password" className="block text-sm font-medium text-gray-700">Password</label>
+          <input 
+            type="password" 
+            id="student-signup-password" 
+            name="password"
+            value={formData.password}
+            onChange={handleInputChange}
+            className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" 
+            placeholder="********" 
+            required 
+          />
+        </div>
+        <div>
+          <label htmlFor="student-signup-grade" className="block text-sm font-medium text-gray-700">Grade Level</label>
+          <input 
+            type="text" 
+            id="student-signup-grade" 
+            name="gradeLevel"
+            value={formData.gradeLevel}
+            onChange={handleInputChange}
+            className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" 
+            placeholder="e.g., 10th Grade" 
+          />
+        </div>
+        <div>
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-bold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 disabled:opacity-50"
+          >
+            {isLoading ? 'Signing Up...' : 'Sign Up as Student'}
+          </button>
+        </div>
+        <div className="text-center text-sm">
+          <span className="text-gray-600">Already have an account?</span>
+          <a href="#" onClick={() => setCurrentForm('login')} className="font-medium text-blue-600 hover:text-blue-500 ml-1 transition duration-150">Login</a>
+        </div>
+        <div className="text-center text-sm">
+          <a href="#" onClick={() => setCurrentRole(null)} className="font-medium text-gray-600 hover:text-gray-800 ml-1 transition duration-150">Change Role</a>
+        </div>
+      </form>
+    );
+  };
 
   // A component for Tutor Signup. It includes a specific field for subjects.
-  const TutorSignupForm = () => (
-    <form className="space-y-6">
-      <h2 className="text-3xl font-bold text-gray-800 mb-2">Tutor Sign Up</h2>
-      <p className="text-gray-500 mb-6">Join us to share your knowledge!</p>
-      <div>
-        <label htmlFor="tutor-signup-name" className="block text-sm font-medium text-gray-700">Full Name</label>
-        <input type="text" id="tutor-signup-name" className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" placeholder="John Doe" required />
-      </div>
-      <div>
-        <label htmlFor="tutor-signup-email" className="block text-sm font-medium text-gray-700">Email Address</label>
-        <input type="email" id="tutor-signup-email" className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" placeholder="you@example.com" required />
-      </div>
-      <div>
-        <label htmlFor="tutor-signup-password" className="block text-sm font-medium text-gray-700">Password</label>
-        <input type="password" id="tutor-signup-password" className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" placeholder="********" required />
-      </div>
-      <div>
-        <label htmlFor="tutor-signup-subjects" className="block text-sm font-medium text-gray-700">Subjects you teach</label>
-        <input type="text" id="tutor-signup-subjects" className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" placeholder="e.g., Math, Science" />
-      </div>
-      <div>
-        <button type="submit" className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-bold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150">
-          Sign Up as Tutor
-        </button>
-      </div>
-      <div className="text-center text-sm">
-        <span className="text-gray-600">Already have an account?</span>
-        <a href="#" onClick={() => setCurrentForm('login')} className="font-medium text-blue-600 hover:text-blue-500 ml-1 transition duration-150">Login</a>
-      </div>
-      <div className="text-center text-sm">
-        <a href="#" onClick={() => setCurrentRole(null)} className="font-medium text-gray-600 hover:text-gray-800 ml-1 transition duration-150">Change Role</a>
-      </div>
-    </form>
-  );
+  const TutorSignupForm = () => {
+    const [formData, setFormData] = useState({
+      name: '',
+      email: '',
+      password: '',
+      subjects: ''
+    });
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleInputChange = (e) => {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value
+      });
+    };
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setIsLoading(true);
+      setError('');
+
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            role: 'tutor',
+            subjects: formData.subjects.split(',').map(s => s.trim()).filter(s => s)
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setRegisteredEmail(formData.email);
+          setCurrentForm('verify');
+        } else {
+          setError(data.message || 'Registration failed');
+        }
+      } catch (err) {
+        setError('Network error. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    return (
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <h2 className="text-3xl font-bold text-gray-800 mb-2">Tutor Sign Up</h2>
+        <p className="text-gray-500 mb-6">Join us to share your knowledge!</p>
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            {error}
+          </div>
+        )}
+        <div>
+          <label htmlFor="tutor-signup-name" className="block text-sm font-medium text-gray-700">Full Name</label>
+          <input 
+            type="text" 
+            id="tutor-signup-name" 
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" 
+            placeholder="John Doe" 
+            required 
+          />
+        </div>
+        <div>
+          <label htmlFor="tutor-signup-email" className="block text-sm font-medium text-gray-700">Email Address</label>
+          <input 
+            type="email" 
+            id="tutor-signup-email" 
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" 
+            placeholder="you@example.com" 
+            required 
+          />
+        </div>
+        <div>
+          <label htmlFor="tutor-signup-password" className="block text-sm font-medium text-gray-700">Password</label>
+          <input 
+            type="password" 
+            id="tutor-signup-password" 
+            name="password"
+            value={formData.password}
+            onChange={handleInputChange}
+            className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" 
+            placeholder="********" 
+            required 
+          />
+        </div>
+        <div>
+          <label htmlFor="tutor-signup-subjects" className="block text-sm font-medium text-gray-700">Subjects you teach</label>
+          <input 
+            type="text" 
+            id="tutor-signup-subjects" 
+            name="subjects"
+            value={formData.subjects}
+            onChange={handleInputChange}
+            className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150" 
+            placeholder="Math, Physics, Chemistry" 
+            required 
+          />
+        </div>
+        <div>
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-bold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 disabled:opacity-50"
+          >
+            {isLoading ? 'Signing Up...' : 'Sign Up as Tutor'}
+          </button>
+        </div>
+        <div className="text-center text-sm">
+          <span className="text-gray-600">Already have an account?</span>
+          <a href="#" onClick={() => setCurrentForm('login')} className="font-medium text-blue-600 hover:text-blue-500 ml-1 transition duration-150">Login</a>
+        </div>
+        <div className="text-center text-sm">
+          <a href="#" onClick={() => setCurrentRole(null)} className="font-medium text-gray-600 hover:text-gray-800 ml-1 transition duration-150">Change Role</a>
+        </div>
+      </form>
+    );
+  };
+
+  // Email verification form
+  const EmailVerificationForm = () => {
+    const [formData, setFormData] = useState({
+      email: registeredEmail,
+      code: ''
+    });
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleInputChange = (e) => {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value
+      });
+    };
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setIsLoading(true);
+      setError('');
+
+      try {
+        const response = await fetch('/api/auth/verify-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            email: formData.email,
+            code: formData.code
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Call onAuthSuccess to set the logged-in user state and navigate
+          onAuthSuccess(data.user);
+        } else {
+          setError(data.message || 'Verification failed');
+        }
+      } catch (err) {
+        setError('Network error. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    return (
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <h2 className="text-3xl font-bold text-gray-800 mb-2">Verify Your Email</h2>
+        <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg mb-4">
+          <p className="font-medium">Verification code sent</p>
+          <p className="text-sm">We've sent a 6-digit code to <strong>{registeredEmail}</strong></p>
+        </div>
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            {error}
+          </div>
+        )}
+        <div>
+          <label htmlFor="verify-code" className="block text-sm font-medium text-gray-700">Verification Code</label>
+          <input 
+            type="text" 
+            id="verify-code" 
+            name="code"
+            value={formData.code}
+            onChange={handleInputChange}
+            className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 text-center text-2xl font-bold letter-spacing-wide" 
+            placeholder="123456" 
+            maxLength="6"
+            required 
+          />
+        </div>
+        <div>
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 disabled:opacity-50"
+          >
+            {isLoading ? 'Verifying...' : 'Verify Email'}
+          </button>
+        </div>
+        <div className="text-center text-sm">
+          <a href="#" onClick={() => setCurrentForm('login')} className="font-medium text-blue-600 hover:text-blue-500 ml-1 transition duration-150">Back to Login</a>
+        </div>
+      </form>
+    );
+  };
 
   // A component to render the Forgot Password form.
   const ForgotPasswordForm = () => (
@@ -214,6 +503,8 @@ const AuthModal = ({ onAuthSuccess, onClose }) => {
         // For 'signup', we still need to differentiate between student and tutor.
         // We'll assume admins don't have a public signup form.
         return currentRole === 'student' ? <StudentSignupForm /> : <TutorSignupForm />;
+      case 'verify':
+        return <EmailVerificationForm />;
       case 'forgotPassword':
         return <ForgotPasswordForm />;
       case 'login':
