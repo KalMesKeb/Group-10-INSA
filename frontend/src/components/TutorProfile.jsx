@@ -1,116 +1,133 @@
+// src/components/TutorProfile.jsx
+
 import React from 'react';
+import { Mail, Phone, Book, GraduationCap, Briefcase, DollarSign, Clock, Video, Info } from 'lucide-react';
 
-const TutorProfile = ({ tutor }) => {
-  // Use actual user data or provide fallback values
-  const tutorData = {
-    id: tutor?.id || tutor?._id || '',
-    name: tutor?.name || tutor?.fullName || 'Your Name',
-    profilePic: tutor?.profilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(tutor?.name || tutor?.fullName || 'User')}&background=3b82f6&color=ffffff&size=150`,
-    bio: tutor?.bio || 'Complete your profile to add a bio.',
-    subjects: tutor?.subjects || [],
-    hourlyRate: tutor?.hourlyRate || 0,
-    education: tutor?.education || [],
-    workExperience: tutor?.workExperience || [],
-    reviews: tutor?.reviews || [],
-    availability: tutor?.availability || 'Set your availability in profile settings',
-    isVerified: tutor?.isVerified || false,
-    email: tutor?.email || ''
-  };
-
-  return (
-    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl p-8 my-8">
-      <div className="flex flex-col md:flex-row items-center md:items-start mb-8">
-        <img
-          src={tutorData.profilePic}
-          alt={`${tutorData.name}'s profile`}
-          className="w-32 h-32 rounded-full object-cover border-4 border-blue-500 shadow-md mb-4 md:mb-0 md:mr-6"
-        />
-        <div className="text-center md:text-left">
-          <h2 className="text-4xl font-bold text-gray-900 flex items-center justify-center md:justify-start">
-            {tutorData.name}
-            {tutorData.isVerified && (
-              <span className="ml-3 text-blue-600 text-xl" title="Verified Tutor">
-                ✅
-              </span>
-            )}
-          </h2>
-          <p className="text-xl text-gray-700 mt-2">{tutorData.subjects.join(', ')}</p>
-          <p className="text-2xl font-semibold text-green-600 mt-3">
-            ${tutorData.hourlyRate}/hour
-          </p>
-          <div className="flex items-center justify-center md:justify-start mt-3">
-            <span className="text-yellow-500 text-xl mr-2">⭐️</span>
-            <span className="text-gray-700 text-lg">
-              {tutorData.reviews.length > 0
-                ? (
-                    tutorData.reviews.reduce((sum, r) => sum + r.rating, 0) /
-                    tutorData.reviews.length
-                  ).toFixed(1)
-                : 'No ratings yet'}
-            </span>
-            <span className="text-gray-500 text-md ml-2">({tutorData.reviews.length} reviews)</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="mb-8">
-        <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">About Me</h3>
-        <p className="text-gray-700 text-lg leading-relaxed">{tutorData.bio}</p>
-      </div>
-
-      <div className="mb-8">
-        <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Education</h3>
-        <ul className="list-disc list-inside text-gray-700 text-lg">
-          {tutorData.education.map((edu, index) => (
-            <li key={index}>
-              <strong>{edu.degree}</strong> from {edu.institution}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mb-8">
-        <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Work Experience</h3>
-        <ul className="list-disc list-inside text-gray-700 text-lg">
-          {tutorData.workExperience.map((work, index) => (
-            <li key={index}>
-              <strong>{work.role}</strong> at {work.company}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mb-8">
-        <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Availability</h3>
-        <p className="text-gray-700 text-lg">{tutorData.availability}</p>
-      </div>
-
-      <div className="mb-8">
-        <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Student Reviews</h3>
-        {tutorData.reviews.length > 0 ? (
-          <div className="space-y-4">
-            {tutorData.reviews.map((review, index) => (
-              <div key={index} className="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <div className="flex items-center mb-2">
-                  <span className="font-semibold text-gray-800 mr-2">{review.student}</span>
-                  <span className="text-yellow-500">{'⭐️'.repeat(review.rating)}</span>
+// The TutorProfile component now expects to receive the profileData object as a prop.
+const TutorProfile = ({ profileData }) => {
+    // CRITICAL FIX: Check if profileData exists. If not, show a message.
+    // This prevents the "Cannot read properties of undefined" error when the page first loads.
+    if (!profileData) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-gray-700 p-8">
+                <div className="bg-white rounded-xl shadow-xl p-10 text-center">
+                    <p className="text-xl font-medium mb-4">No tutor profile data available.</p>
+                    <p className="text-sm">Please complete the registration form to view your profile.</p>
                 </div>
-                <p className="text-gray-700 italic">"{review.comment}"</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-600">No reviews yet. Be the first to leave one!</p>
-        )}
-      </div>
+            </div>
+        );
+    }
 
-      <div className="text-center mt-10">
-        <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
-          Book a Session
-        </button>
-      </div>
-    </div>
-  );
+    const {
+        bio,
+        education,
+        workExperience,
+        subjects,
+        pricing,
+        availability,
+        profilePic,
+        demoVideo
+    } = profileData;
+
+    return (
+        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-gray-50 mt-20">
+            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden transform transition-all duration-300 hover:scale-[1.01]">
+                <div className="relative h-64 bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center p-6">
+                    <img
+                        src={profilePic || 'https://via.placeholder.com/150'}
+                        alt="Profile"
+                        className="w-48 h-48 rounded-full border-8 border-white shadow-lg object-cover ring-2 ring-purple-300"
+                    />
+                </div>
+                <div className="p-10 text-center">
+                    <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mt-4 mb-2">
+                        {profileData.name}
+                    </h1>
+                    <p className="text-lg text-indigo-600 font-semibold mb-6">
+                        Tutor Profile
+                    </p>
+
+                    <div className="text-gray-600 mt-8 mb-10 text-left space-y-4">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                            <Info className="mr-3 text-indigo-500" size={24} /> Bio
+                        </h2>
+                        <p className="text-lg leading-relaxed italic">"{bio || 'No bio provided.'}"</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                        {/* Contact Information */}
+                        <div className="bg-gray-100 p-6 rounded-2xl shadow-inner border border-gray-200">
+                            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <Mail className="mr-2 text-blue-500" size={20} /> Contact
+                            </h3>
+                            <p className="text-gray-700 flex items-center mb-2"><Mail className="mr-2 text-gray-400" size={16} />{profileData.email}</p>
+                            <p className="text-gray-700 flex items-center"><Phone className="mr-2 text-gray-400" size={16} />{profileData.phone}</p>
+                        </div>
+
+                        {/* Subjects */}
+                        <div className="bg-gray-100 p-6 rounded-2xl shadow-inner border border-gray-200">
+                            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <Book className="mr-2 text-green-500" size={20} /> Subjects
+                            </h3>
+                            {/* CRITICAL FIX: Add a check for subjects array and handle undefined gracefully */}
+                            <p className="text-gray-700">{subjects && subjects.length > 0 ? subjects.join(', ') : 'No subjects listed.'}</p>
+                        </div>
+
+                        {/* Pricing & Availability */}
+                        <div className="bg-gray-100 p-6 rounded-2xl shadow-inner border border-gray-200">
+                            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <DollarSign className="mr-2 text-yellow-500" size={20} /> Rates & Availability
+                            </h3>
+                            <p className="text-gray-700 flex items-center mb-2"><DollarSign className="mr-2 text-gray-400" size={16} />Hourly: {pricing?.hourly ? `${pricing.hourly} Birr` : 'N/A'}</p>
+                            <p className="text-gray-700 flex items-center"><Clock className="mr-2 text-gray-400" size={16} />{availability?.text || 'Not specified'}</p>
+                        </div>
+
+                    </div>
+
+                    {/* Education and Experience Sections */}
+                    <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="bg-gray-100 p-8 rounded-2xl shadow-lg border border-gray-200">
+                            <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                <GraduationCap className="mr-3 text-red-500" size={24} /> Education
+                            </h3>
+                            {education?.map((edu, index) => (
+                                <div key={index} className="mb-4 last:mb-0">
+                                    <h4 className="font-semibold text-lg text-gray-900">{edu.degree}</h4>
+                                    <p className="text-gray-600 italic">{edu.institution}</p>
+                                </div>
+                            )) || <p className="text-gray-600">No education listed.</p>}
+                        </div>
+
+                        <div className="bg-gray-100 p-8 rounded-2xl shadow-lg border border-gray-200">
+                            <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                <Briefcase className="mr-3 text-purple-500" size={24} /> Work Experience
+                            </h3>
+                            {workExperience?.map((work, index) => (
+                                <div key={index} className="mb-4 last:mb-0">
+                                    <h4 className="font-semibold text-lg text-gray-900">{work.role}</h4>
+                                    <p className="text-gray-600 italic">{work.company}</p>
+                                </div>
+                            )) || <p className="text-gray-600">No work experience listed.</p>}
+                        </div>
+                    </div>
+
+                    {/* Demo Video Section */}
+                    <div className="mt-12 bg-gray-100 p-8 rounded-2xl shadow-lg border border-gray-200">
+                        <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <Video className="mr-3 text-pink-500" size={24} /> Demo Video
+                        </h3>
+                        {demoVideo ? (
+                            <video controls src={demoVideo} className="w-full rounded-xl shadow-md border-4 border-white"></video>
+                        ) : (
+                            <p className="text-gray-600 italic">No demo video uploaded.</p>
+                        )}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default TutorProfile;

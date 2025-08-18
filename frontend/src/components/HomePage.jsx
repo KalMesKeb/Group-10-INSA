@@ -64,7 +64,7 @@ const [searchQuery, setSearchQuery] = useState('');
         </h2>
         {/* Call to action button */}
         <button  onClick={() => navigate('AuthModal')}
-          className=" cursor-pointer bg-white-500 text-white-600 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-200 transition-all duration-300">
+          className="cursor-pointer bg-green-600 text-white-600 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-200 transition-all duration-300">
           Get Started
         </button>
       </div>
@@ -73,7 +73,7 @@ const [searchQuery, setSearchQuery] = useState('');
       <div className="flex justify-center space-x-6" mx-auto>
         
         <button
-          onClick={() => navigate('student-dashboard')} 
+          onClick={() => navigate('tutor-list')} 
           className=" cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"
         >
           Find a Tutor

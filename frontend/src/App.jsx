@@ -1,5 +1,6 @@
 // src/App.jsx
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './components/HomePage';
@@ -13,46 +14,15 @@ import AboutUs from './pages/about';
 import AdminDashboard from './components/AdminDashboard';
 import LiveSessionRoom from './components/LiveSessionRoom';
 import DisputeReport from './components/DisputeReport';
+import TutorList from './components/TutorList';
+import TutorDashboard from './components/TutorDashboard'; // Import the new TutorDashboard component
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [liveRoomId, setLiveRoomId] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Check for existing session on app load
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const response = await fetch('/api/auth/me', {
-          method: 'GET',
-          credentials: 'include'
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success && data.user) {
-            setLoggedInUser(data.user);
-            // Navigate to appropriate dashboard based on role
-            if (data.user.role === 'admin') {
-              setCurrentPage('admin-dashboard');
-            } else if (data.user.role === 'tutor') {
-              setCurrentPage('tutor-profile');
-            } else {
-              setCurrentPage('student-dashboard');
-            }
-          }
-        }
-      } catch (error) {
-        console.log('No active session');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    checkSession();
-  }, []);
+  const [tutorProfileData, setTutorProfileData] = useState(null);
 
   const navigate = (page) => {
     setCurrentPage(page);
@@ -65,10 +35,16 @@ function App() {
     if (user.role === 'admin') {
       navigate('admin-dashboard');
     } else if (user.role === 'tutor') {
-      navigate('tutor-profile');
+      // Direct tutors to their new dashboard after successful login
+      navigate('tutor-dashboard');
     } else {
       navigate('student-dashboard');
     }
+  };
+
+  const handleTutorRegistrationSuccess = (profileData) => {
+    setTutorProfileData(profileData);
+    navigate('tutor-profile');
   };
 
   const handleLogout = () => {
@@ -83,7 +59,13 @@ function App() {
 
   const leaveLiveSession = () => {
     setLiveRoomId(null);
-    navigate('student-dashboard');
+    if (loggedInUser.role === 'student') {
+        navigate('student-dashboard');
+    } else if (loggedInUser.role === 'tutor') {
+        navigate('tutor-dashboard');
+    } else {
+        navigate('home');
+    }
   };
 
   // This is the new component for controlling access to pages.
@@ -93,13 +75,13 @@ function App() {
     if (!loggedInUser) {
       return (
         <div className="flex flex-col items-center justify-center h-screen text-gray-800 p-6 text-center">
-          <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
-          <p className="mb-6">Please log in to view this page.</p>
+          
+          <p className="mb-6">Please first Register to Become a tutor</p>
           <button
             onClick={() => setIsAuthModalOpen(true)}
-            className="px-6 py-2 bg-blue-600 text-white font-medium rounded-full shadow-md hover:bg-blue-700 transition-colors"
+            className="cursor-pointer px-6 py-2 bg-green-600 text-white font-medium rounded-full shadow-md hover:bg-green-700 transition-colors"
           >
-            Log In
+            Register
           </button>
         </div>
       );
@@ -146,23 +128,43 @@ function App() {
 
       <main className="flex-grow container mx-auto p-4">
         {/* Public Pages */}
-        {currentPage === 'home' && <HomePage navigate={navigate} />}
+        {currentPage === 'home' && <HomePage navigate={navigate} 
+          onLoginClick={() => setIsAuthModalOpen(true)}
+          loggedInUser={loggedInUser}
+        onLogout={handleLogout}
+        
+        />}
         {currentPage === 'login' && <Login navigate={navigate} />}
         {currentPage === 'contact' && <Contact />}
         {currentPage === 'about' && <AboutUs />}
+        {currentPage === 'tutor-list' && <TutorList />} {/* TutorList is now a public page */}
+
         {currentPage === 'student-dashboard' && (
-          <StudentDashboard
-            joinLiveSession={joinLiveSession}
-            loggedInUser={loggedInUser}
-            onLoginClick={() => setIsAuthModalOpen(true)}
-          />
+          <ProtectedWrapper allowedRoles={['student']}>
+            <StudentDashboard
+              joinLiveSession={joinLiveSession}
+              loggedInUser={loggedInUser}
+              onLoginClick={() => setIsAuthModalOpen(true)}
+            />
+          </ProtectedWrapper>
         )}
 
         {/* Protected Pages */}
         {/* Tutor Registration */}
         {currentPage === 'tutor-register' && (
           <ProtectedWrapper allowedRoles={['tutor']}>
-            <TutorRegistration />
+            {/* UPDATED: Pass the new callback function as a prop */}
+            <TutorRegistration onRegistrationSuccess={handleTutorRegistrationSuccess} />
+          </ProtectedWrapper>
+        )}
+        
+        {/* Tutor Dashboard */}
+        {currentPage === 'tutor-dashboard' && (
+          <ProtectedWrapper allowedRoles={['tutor']}>
+            <TutorDashboard
+              loggedInUser={loggedInUser}
+              joinLiveSession={joinLiveSession}
+            />
           </ProtectedWrapper>
         )}
 
@@ -183,7 +185,8 @@ function App() {
         {/* Tutor Profile */}
         {currentPage === 'tutor-profile' && (
           <ProtectedWrapper allowedRoles={['tutor']}>
-            <TutorProfile tutor={loggedInUser} />
+            {/* UPDATED: Pass the profile data from state as a prop */}
+            <TutorProfile profileData={tutorProfileData} />
           </ProtectedWrapper>
         )}
 

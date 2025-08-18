@@ -195,7 +195,7 @@ const AdminDashboard = () => {
         <div className="flex bg-gray-100 min-h-screen mt-30">
             <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
             <div className="flex-1 p-10">
-                <h1 className="text-5xl font-extrabold text-center text-gray-900 mb-12">Admin Dashboard ⚙️</h1>
+               
                 {renderContent()}
             </div>
         </div>

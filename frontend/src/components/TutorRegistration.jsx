@@ -1,11 +1,12 @@
-// TutorRegistration.jsx
+// src/components/TutorRegistration.jsx
 
 import React, { useState } from 'react';
+// IMPORT FIXED: This line is now used to add the data
 import { addTutorApplication } from './dataStore';
 
-const TutorRegistration = () => {
+// The onRegistrationSuccess prop is still used to navigate the user after successful submission
+const TutorRegistration = ({ onRegistrationSuccess }) => {
     const [step, setStep] = useState(1);
-    const [isSubmitted, setIsSubmitted] = useState(false);
     const [formData, setFormData] = useState({
         personalDetails: { name: '', email: '', phone: '', age: '', gender: '' },
         credentials: { education: [{ degree: '', institution: '' }], workExperience: [{ role: '', company: '' }] },
@@ -103,36 +104,14 @@ const TutorRegistration = () => {
             },
         };
 
+        // NEW FIX: This is the critical line. It adds the new application
+        // to the shared data store so the Admin Dashboard can see it.
         addTutorApplication(newApplication);
 
-        setIsSubmitted(true);
-        setStep(1);
-        setFormData({
-            personalDetails: { name: '', email: '', phone: '', age: '', gender: '' },
-            credentials: { education: [{ degree: '', institution: '' }], workExperience: [{ role: '', company: '' }] },
-            subjects: [],
-            pricing: { hourly: '', packages: [] },
-            availability: {},
-            bio: '',
-            profilePic: null,
-            demoVideo: null,
-        });
+        // This still handles navigating to the profile page for the user
+        // after the data is successfully submitted to the store.
+        onRegistrationSuccess(newApplication.profileData);
     };
-
-    if (isSubmitted) {
-        return (
-            <div className="max-w-xl mx-auto py-5 px-4 mt-24 text-center bg-white rounded-2xl shadow-2xl border border-gray-200">
-                <h2 className="text-s font-extrabold text-green-600 mb-6">Successfully Submitted! </h2>
-                <p className="text-s text-gray-700">Thank you for registering. Your profile is now under review by our admin team. We will notify you via email once it has been approved. This may take up to 48 hours.</p>
-                <button
-                    onClick={() => setIsSubmitted(false)}
-                    className="mt-1 bg-indigo-600 hover:bg-indigo-700 text-white font-normal py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-50"
-                >
-                    Return to Home
-                </button>
-            </div>
-        );
-    }
 
     const renderStep = () => {
         const inputStyle = "shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors";
