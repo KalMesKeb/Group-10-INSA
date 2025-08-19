@@ -81,7 +81,7 @@ The platform connects students and tutors via a web interface, matching users th
 
 ### 3.5 Operating Environment
 - Web browsers (Chrome, Firefox), Mobile (Android first)  
-- PostgreSQL, hosted on Firebase servers  
+- MongoDB  
 
 ---
 
