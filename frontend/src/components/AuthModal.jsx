@@ -17,7 +17,6 @@ const AuthModal = ({ onAuthSuccess, onClose }) => {
         Welcome to Ethio-Tutors!
       </h2>
       <p className="text-gray-500 mb-6 max-w-sm">Select your role to continue your educational journey</p>
-      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-lg">
         <motion.button
           whileHover={{ y: -5, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
@@ -31,7 +30,6 @@ const AuthModal = ({ onAuthSuccess, onClose }) => {
           </div>
           Student
         </motion.button>
-
         <motion.button
           whileHover={{ y: -5, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
           onClick={() => setCurrentRole('tutor')}
@@ -57,9 +55,9 @@ const AuthModal = ({ onAuthSuccess, onClose }) => {
             </svg>
           </div>
           {/* Admin */}
-        </motion.button>
+        </motion.button> 
       </div>
-    </motion.div>
+    </motion.div>  
   );
 
   const LoginForm = ({ role }) => {
@@ -193,7 +191,6 @@ const AuthModal = ({ onAuthSuccess, onClose }) => {
             {loading ? 'Logging in...' : `Login as ${buttonText}`}
           </button>
         </div>
-
         {role !== 'admin' && (
           <div className="text-center text-sm">
             <span className="text-gray-600">Don't have an account?</span>
@@ -203,10 +200,9 @@ const AuthModal = ({ onAuthSuccess, onClose }) => {
               className="font-medium text-green-600 hover:text-green-500 ml-1 transition duration-150"
             >
               Sign Up
-            </button>
+            </button>   
           </div>
         )}
-
         <div className="text-center text-sm">
           <button 
             type="button"
