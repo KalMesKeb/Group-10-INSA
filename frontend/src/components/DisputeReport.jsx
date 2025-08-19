@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { disputeAPI } from '../utils/api';
+import { motion } from 'framer-motion';
 
-const  DisputeReport = async () => {
+const DisputeReport = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -35,46 +36,44 @@ const  DisputeReport = async () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Simple validation
-        if (!formData.name || !formData.email || !formData.issue) {
-            // Using a custom message box instead of alert()
-            // In a real application, you'd use a modal or a styled notification
-            console.log('Please fill out all fields.');
-            return;
+        const newErrors = {};
+        if (!formData.name.trim()) {
+            newErrors.name = 'Name is required';
         }
-        
         if (!formData.email.trim()) {
             newErrors.email = 'Email is required';
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
             newErrors.email = 'Please enter a valid email';
         }
-        
         if (!formData.issue.trim()) {
             newErrors.issue = 'Issue description is required';
-        } else if (formData.issue.length < 20) {
+        } else if (formData.issue.trim().length < 20) {
             newErrors.issue = 'Please provide more details (at least 20 characters)';
         }
-        
+
         setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
+        if (Object.keys(newErrors).length > 0) return;
 
         try {
-            // Submit dispute to backend API
+            setIsLoading(true);
             const disputeData = {
-                name: formData.name,
-                email: formData.email,
-                issue: formData.issue
+                name: formData.name.trim(),
+                email: formData.email.trim(),
+                issue: formData.issue.trim()
             };
 
             const response = await disputeAPI.submitDispute(disputeData);
-            
-            if (response.success) {
+            if (response?.success) {
                 setIsSubmitted(true);
+            } else {
+                console.error('Dispute submission failed:', response);
+                alert('Failed to submit dispute. Please try again.');
             }
         } catch (error) {
             console.error('Error submitting dispute:', error);
             alert('Failed to submit dispute. Please try again.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -276,6 +275,6 @@ const  DisputeReport = async () => {
             </div>
         </motion.div>
     );
-;
+}
 
 export default DisputeReport;
