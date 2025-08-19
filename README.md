@@ -172,7 +172,7 @@ Relational schema, encrypted personal data, scalable to 1M users.
 ### 6.5 Design Constraints
 - **Backend:** Express  
 - **Frontend:** React  
-- **DB:** PostgreSQL  
+- **DB:** MongoDB  
 - **OS:** Windows  
 
 ---
