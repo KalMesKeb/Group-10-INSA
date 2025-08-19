@@ -102,7 +102,7 @@ const HomePage = ({ navigate }) => {
             </div>
             <button
               type="submit"
-              className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
+              className="cursor-pointer w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
             >
               Find Tutors
             </button>
@@ -111,13 +111,13 @@ const HomePage = ({ navigate }) => {
           <div className="flex flex-wrap justify-center gap-6 mt-12">
             <button 
               onClick={() => navigate('tutor-list')}
-              className="flex items-center gap-2 bg-white text-emerald-600 hover:bg-emerald-50 font-semibold py-3 px-6 rounded-full shadow-md transition-all"
+              className="cursor-pointer flex items-center gap-2 bg-white text-emerald-600 hover:bg-emerald-50 font-semibold py-3 px-6 rounded-full shadow-md transition-all"
             >
               <Users size={20} /> Browse Tutors
             </button>
             <button
               onClick={() => navigate('tutor-register')}
-              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-full shadow-md transition-all"
+              className="cursor-pointer flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-full shadow-md transition-all"
             >
               <GraduationCap size={20} /> Teach with Us
             </button>
@@ -182,7 +182,7 @@ const HomePage = ({ navigate }) => {
                   </div>
                   <button 
                     onClick={() => navigate('tutor-list')}
-                    className="mt-4 w-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-medium py-2 px-4 rounded-lg transition-colors"
+                    className="cursor-pointer mt-4 w-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-medium py-2 px-4 rounded-lg transition-colors"
                   >
                     View Profile
                   </button>
@@ -194,7 +194,7 @@ const HomePage = ({ navigate }) => {
           <div className="text-center mt-12">
             <button
               onClick={() => navigate('tutor-list')}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all"
+              className="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all"
             >
               Browse All Tutors
             </button>
