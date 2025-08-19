@@ -47,12 +47,7 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
           >
             About Us
           </button>
-          <button
-            onClick={() => handleNavigate('contact')}
-            className=" cursor-pointer text-black hover:text-gray-300 transition-colors duration-200"
-          >
-            Contact
-          </button>
+         
           
           {/* Student-specific links */}
           {loggedInUser?.role === 'student' && (
@@ -113,7 +108,7 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
           {loggedInUser ? (
             <button
               onClick={onLogout}
-              className="cursor-pointer bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all duration-300"
+              className="cursor-pointer bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all duration-300"
             >
               Logout
             </button>
@@ -214,17 +209,12 @@ const Header = ({ navigate, onLoginClick, loggedInUser, onLogout }) => {
           About Us
         </button>
 
-        <button
-          onClick={() => handleNavigate('contact')}
-          className="text-black text-xl hover:text-gray-700 transition-colors duration-200"
-        >
-          Contact
-        </button>
+       
 
         {loggedInUser ? (
           <button
             onClick={onLogout}
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all duration-300"
+            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all duration-300"
           >
             Logout
           </button>

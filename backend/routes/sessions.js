@@ -80,7 +80,50 @@ router.post('/book', authenticateSession, [
   }
 });
 
-// Get user's sessions
+// Get user's sessions (both /my and root / for compatibility)
+router.get('/', authenticateSession, async (req, res) => {
+  try {
+    const { status, page = 1, limit = 10 } = req.query;
+    const query = {};
+    
+    // Add user filter based on role
+    if (req.session.userRole === 'student') {
+      query.studentId = req.session.userId;
+    } else if (req.session.userRole === 'tutor') {
+      query.tutorId = req.session.userId;
+    }
+    
+    if (status) {
+      query.status = status;
+    }
+
+    const sessions = await Session.find(query)
+      .populate('studentId', 'name email')
+      .populate('tutorId', 'name email')
+      .sort({ scheduledDate: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const total = await Session.countDocuments(query);
+
+    res.json({
+      success: true,
+      sessions,
+      pagination: {
+        current: page,
+        pages: Math.ceil(total / limit),
+        total
+      }
+    });
+  } catch (error) {
+    console.error('Get sessions error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch sessions'
+    });
+  }
+});
+
 router.get('/my', authenticateSession, async (req, res) => {
   try {
     const { status, page = 1, limit = 10 } = req.query;

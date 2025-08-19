@@ -137,5 +137,22 @@ export const handleUploadError = (error, req, res, next) => {
   next(error);
 };
 
+// General upload middleware for frontend API calls
+export const uploadGeneral = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    // Allow 'file' field name for general uploads
+    if (file.fieldname === 'file') {
+      cb(null, true);
+    } else {
+      cb(new Error('Unexpected field name'), false);
+    }
+  },
+  limits: {
+    fileSize: 100 * 1024 * 1024, // 100MB limit
+    files: 1
+  }
+}).single('file');
+
 // Export a default multer instance for general use
 export default multer;

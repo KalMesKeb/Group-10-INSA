@@ -3,6 +3,8 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { body, validationResult } from 'express-validator';
 import User from '../models/User.js';
+import Tutor from '../models/Tutor.js';
+import Admin from '../models/Admin.js';
 import VerificationCode from '../models/VerificationCode.js';
 import { authenticateSession, authorizeRoles, authRateLimit } from '../middleware/session.js';
 import { sendVerificationEmail } from '../config/email.js';
@@ -38,29 +40,38 @@ router.post('/register', authRateLimit, [
 
     const { name, email, password, role, gradeLevel, subjects } = req.body;
 
-    // Check if user already exists
+    // Check if user already exists in any collection
     const existingUser = await User.findOne({ email });
+    const existingTutor = await Tutor.findOne({ email });
+    const existingAdmin = await Admin.findOne({ email });
 
-    if (existingUser) {
+    if (existingUser || existingTutor || existingAdmin) {
       return res.status(400).json({
         success: false,
         message: 'User with this email already exists'
       });
     }
 
-    // Create user data
-    const userData = { name, email, password, role };
+    let user;
     
-    // Add role-specific data
-    if (role === 'student' && gradeLevel) {
-      userData.studentProfile = { gradeLevel };
-    }
-    if (role === 'tutor' && subjects) {
-      userData.tutorProfile = { subjects: Array.isArray(subjects) ? subjects : [subjects] };
+    // Create user in appropriate collection based on role
+    if (role === 'student') {
+      const userData = { name, email, password };
+      if (gradeLevel) {
+        userData.studentProfile = { gradeLevel };
+      }
+      user = new User(userData);
+    } else if (role === 'tutor') {
+      const tutorData = { name, email, password, isVerified: false };
+      if (subjects) {
+        tutorData.subjects = Array.isArray(subjects) ? subjects : [subjects];
+      }
+      user = new Tutor(tutorData);
+    } else if (role === 'admin') {
+      const adminData = { name, email, password };
+      user = new Admin(adminData);
     }
 
-    // Create new user (but not verified yet)
-    const user = new User(userData);
     await user.save();
 
     // Generate 6-digit verification code
@@ -95,7 +106,7 @@ router.post('/register', authRateLimit, [
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
+        role: role,
         emailVerified: user.emailVerified
       }
     });
@@ -125,8 +136,15 @@ router.post('/verify-email', [
 
     const { email, code } = req.body;
 
-    // Find the user by email
-    const user = await User.findOne({ email });
+    // Find the user by email across all collections
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = await Tutor.findOne({ email });
+    }
+    if (!user) {
+      user = await Admin.findOne({ email });
+    }
+    
     if (!user) {
       return res.status(400).json({
         success: false,
@@ -167,6 +185,7 @@ router.post('/verify-email', [
     
     // Create session for the user
     req.session.userId = user._id;
+    req.session.userRole = user.role;
     req.session.user = {
       id: user._id,
       name: user.name,
@@ -198,7 +217,18 @@ router.post('/verify-email', [
 // Get current user session
 router.get('/me', authenticateSession, async (req, res) => {
   try {
-    const user = await User.findById(req.session.userId).select('-password');
+    // Search across all collections
+    let user = await User.findById(req.session.userId).select('-password');
+    let userRole = 'student';
+    
+    if (!user) {
+      user = await Tutor.findById(req.session.userId).select('-password');
+      userRole = 'tutor';
+    }
+    if (!user) {
+      user = await Admin.findById(req.session.userId).select('-password');
+      userRole = 'admin';
+    }
     
     if (!user) {
       return res.status(404).json({
@@ -213,8 +243,9 @@ router.get('/me', authenticateSession, async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
-        emailVerified: user.emailVerified
+        role: userRole,
+        emailVerified: user.emailVerified,
+        isVerified: user.isVerified || undefined
       }
     });
   } catch (error) {
@@ -243,12 +274,23 @@ router.post('/login', authRateLimit, [
 
     const { email, password } = req.body;
 
-    // Check if user exists and password is correct
-    const user = await User.findOne({ email }).select('+password');
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    // Check if user exists across all collections
+    let user = await User.findOne({ email }).select('+password');
+    let userRole = 'student';
+
+    if (!user) {
+      user = await Tutor.findOne({ email }).select('+password');
+      userRole = 'tutor';
+    }
+    if (!user) {
+      user = await Admin.findOne({ email }).select('+password');
+      userRole = 'admin';
+    }
+
+    if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password'
+        message: 'Invalid credentials'
       });
     }
 
@@ -268,8 +310,9 @@ router.post('/login', authRateLimit, [
 
     // Create session
     req.session.userId = user._id;
-    req.session.userRole = user.role;
+    req.session.userRole = userRole;
     req.session.loginTime = new Date();
+
 
     res.json({
       success: true,
@@ -278,7 +321,7 @@ router.post('/login', authRateLimit, [
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
+        role: userRole,
         isOnline: user.isOnline
       }
     });
@@ -294,7 +337,15 @@ router.post('/login', authRateLimit, [
 // Logout user
 router.post('/logout', authenticateSession, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    // Find user across all collections
+    let user = await User.findById(req.user.id);
+    if (!user) {
+      user = await Tutor.findById(req.user.id);
+    }
+    if (!user) {
+      user = await Admin.findById(req.user.id);
+    }
+    
     if (user) {
       user.isOnline = false;
       user.lastSeen = new Date();

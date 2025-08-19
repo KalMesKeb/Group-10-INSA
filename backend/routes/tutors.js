@@ -1,5 +1,6 @@
 import express from 'express';
 import User from '../models/User.js';
+import Tutor from '../models/Tutor.js';
 import TutorApplication from '../models/TutorApplication.js';
 import { auth, authorize } from '../middleware/auth.js';
 import { body, validationResult } from 'express-validator';
@@ -24,42 +25,42 @@ router.get('/', async (req, res) => {
       sortOrder = 'desc'
     } = req.query;
 
-    // Build query for approved tutors
+    // Build query for verified and approved tutors
     let query = { 
-      role: 'tutor',
-      'tutorProfile.isApproved': true,
-      'tutorProfile.isActive': true
+      isVerified: true,
+      isApproved: true,
+      isActive: true
     };
 
     // Search by name or subjects
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
-        { 'tutorProfile.subjects': { $regex: search, $options: 'i' } },
-        { 'tutorProfile.bio': { $regex: search, $options: 'i' } }
+        { subjects: { $regex: search, $options: 'i' } },
+        { bio: { $regex: search, $options: 'i' } }
       ];
     }
 
     // Filter by specific subject
     if (subject) {
-      query['tutorProfile.subjects'] = { $regex: subject, $options: 'i' };
+      query.subjects = { $regex: subject, $options: 'i' };
     }
 
     // Filter by price range
     if (minPrice || maxPrice) {
-      query['tutorProfile.hourlyRate'] = {};
-      if (minPrice) query['tutorProfile.hourlyRate'].$gte = parseFloat(minPrice);
-      if (maxPrice) query['tutorProfile.hourlyRate'].$lte = parseFloat(maxPrice);
+      query['pricing.hourlyRate'] = {};
+      if (minPrice) query['pricing.hourlyRate'].$gte = parseFloat(minPrice);
+      if (maxPrice) query['pricing.hourlyRate'].$lte = parseFloat(maxPrice);
     }
 
     // Filter by minimum rating
     if (rating) {
-      query['tutorProfile.averageRating'] = { $gte: parseFloat(rating) };
+      query.rating = { $gte: parseFloat(rating) };
     }
 
     // Filter by availability
     if (availability) {
-      query['tutorProfile.availability'] = { $regex: availability, $options: 'i' };
+      query[`availability.${availability}`] = { $exists: true };
     }
 
     // Calculate pagination
@@ -72,15 +73,14 @@ router.get('/', async (req, res) => {
     sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
     // Execute query with pagination
-    const tutors = await User.find(query)
-      .select('-password -__v')
+    const tutors = await Tutor.find(query)
+      .select('-password')
       .sort(sort)
       .skip(skip)
-      .limit(limitNum)
-      .lean();
+      .limit(limitNum);
 
     // Get total count for pagination
-    const total = await User.countDocuments(query);
+    const total = await Tutor.countDocuments(query);
 
     // Calculate pagination info
     const totalPages = Math.ceil(total / limitNum);
@@ -109,15 +109,23 @@ router.get('/', async (req, res) => {
 });
 
 // @route   GET /api/tutors/:id
-// @desc    Get tutor profile by ID
+// @desc    Get tutor by ID
 // @access  Public
 router.get('/:id', async (req, res) => {
   try {
-    const tutor = await User.findOne({
+    // Validate ObjectId format
+    if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid tutor ID format'
+      });
+    }
+
+    const tutor = await Tutor.findOne({
       _id: req.params.id,
-      role: 'tutor',
-      'tutorProfile.isApproved': true
-    }).select('-password -__v').lean();
+      isVerified: true,
+      isApproved: true
+    }).select('-password');
 
     if (!tutor) {
       return res.status(404).json({
@@ -130,12 +138,11 @@ router.get('/:id', async (req, res) => {
       success: true,
       data: tutor
     });
-
   } catch (error) {
-    console.error('Error fetching tutor:', error);
+    console.error('Get tutor error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error while fetching tutor'
+      message: 'Server error'
     });
   }
 });
@@ -145,10 +152,10 @@ router.get('/:id', async (req, res) => {
 // @access  Public
 router.get('/subjects/list', async (req, res) => {
   try {
-    const subjects = await User.aggregate([
-      { $match: { role: 'tutor', 'tutorProfile.isApproved': true } },
-      { $unwind: '$tutorProfile.subjects' },
-      { $group: { _id: '$tutorProfile.subjects' } },
+    const subjects = await Tutor.aggregate([
+      { $match: { isVerified: true, isApproved: true } },
+      { $unwind: '$subjects' },
+      { $group: { _id: '$subjects' } },
       { $sort: { _id: 1 } }
     ]);
 

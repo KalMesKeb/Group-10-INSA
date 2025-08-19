@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-const userSchema = new mongoose.Schema({
+const adminSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Name is required'],
@@ -22,6 +22,18 @@ const userSchema = new mongoose.Schema({
       message: 'Please enter a valid email'
     }
   },
+  password: {
+    type: String,
+    required: [true, 'Password is required'],
+    minlength: [6, 'Password must be at least 6 characters long']
+  },
+  role: {
+    type: String,
+    default: 'admin',
+    enum: ['admin']
+  },
+  phone: String,
+  profilePicture: String,
   isActive: {
     type: Boolean,
     default: true
@@ -30,32 +42,14 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  emailVerificationToken: {
-    type: String
-  },
-  emailVerificationExpires: {
-    type: Date
-  },
+  emailVerificationToken: String,
+  emailVerificationExpires: Date,
   loginAttempts: {
     type: Number,
     default: 0
   },
   lockUntil: Date,
   lastLogin: Date,
-  password: {
-    type: String,
-    required: [true, 'Password is required'],
-    minlength: [6, 'Password must be at least 6 characters long']
-  },
-  role: {
-    type: String,
-    enum: ['student'],
-    default: 'student'
-  },
-  avatar: {
-    type: String,
-    default: null
-  },
   isOnline: {
     type: Boolean,
     default: false
@@ -66,30 +60,21 @@ const userSchema = new mongoose.Schema({
   },
   passwordResetToken: String,
   passwordResetExpires: Date,
-  joinedRooms: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Room'
-  }],
-  phone: String,
-  age: Number,
-  gender: {
+  // Admin-specific fields
+  permissions: [{
     type: String,
-    enum: ['male', 'female', 'other', 'prefer_not_to_say']
-  },
-  profilePicture: String,
-  // Student-specific fields
-  studentProfile: {
-    grade: String,
-    interests: [String],
-    learningStyle: String,
-    goals: String
+    enum: ['manage_users', 'manage_tutors', 'manage_sessions', 'manage_disputes', 'view_analytics']
+  }],
+  isSuperAdmin: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true
 });
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
+adminSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   
   try {
@@ -102,15 +87,15 @@ userSchema.pre('save', async function(next) {
 });
 
 // Compare password method
-userSchema.methods.comparePassword = async function(candidatePassword) {
+adminSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
 // Remove password from JSON output
-userSchema.methods.toJSON = function() {
-  const userObject = this.toObject();
-  delete userObject.password;
-  return userObject;
+adminSchema.methods.toJSON = function() {
+  const adminObject = this.toObject();
+  delete adminObject.password;
+  return adminObject;
 };
 
-export default mongoose.model('User', userSchema);
+export default mongoose.model('Admin', adminSchema);

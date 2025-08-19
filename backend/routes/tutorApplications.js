@@ -2,6 +2,7 @@ import express from 'express';
 import { body, validationResult } from 'express-validator';
 import TutorApplication from '../models/TutorApplication.js';
 import User from '../models/User.js';
+import Tutor from '../models/Tutor.js';
 import { authenticateSession, authorizeRoles } from '../middleware/session.js';
 
 const router = express.Router();
@@ -58,26 +59,45 @@ router.post('/submit', authenticateSession, [
       personalDetails,
       credentials,
       subjects,
+      bio,
       pricing,
       availability,
-      bio,
-      profilePicture,
+      profilePic,
       demoVideo
     } = req.body;
 
     const application = new TutorApplication({
-      applicantId: req.userId,
-      personalDetails,
+      applicantId: req.user.id,
+      name: personalDetails.name,
+      email: personalDetails.email,
+      phone: personalDetails.phone,
+      age: personalDetails.age,
+      gender: personalDetails.gender,
       credentials,
       subjects,
       pricing,
       availability,
       bio,
-      profilePicture,
+      profilePicture: profilePic,
       demoVideo
     });
 
     await application.save();
+
+    // Set tutor as verified when they complete registration
+    const tutor = await Tutor.findById(req.userId);
+    if (tutor) {
+      tutor.isVerified = true;
+      tutor.subjects = subjects;
+      tutor.bio = bio;
+      tutor.education = credentials.education || [];
+      tutor.workExperience = credentials.workExperience || [];
+      tutor.pricing = pricing;
+      tutor.availability = availability;
+      tutor.profilePicture = profilePicture;
+      tutor.demoVideo = demoVideo;
+      await tutor.save();
+    }
 
     res.status(201).json({
       success: true,

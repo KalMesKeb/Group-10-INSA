@@ -1,7 +1,7 @@
 // src/components/TutorList.jsx
 
 import React, { useState, useEffect } from 'react';
-import { getApprovedTutors } from './dataStore';
+import { tutorAPI } from '../utils/api';
 
 /**
  * A publicly viewable component that displays a list of approved tutors.
@@ -18,8 +18,18 @@ const TutorList = () => {
 
     // Fetch the list of approved tutors when the component mounts
     useEffect(() => {
-        const approvedTutors = getApprovedTutors();
-        setTutors(approvedTutors);
+        const loadTutors = async () => {
+            try {
+                const response = await tutorAPI.searchTutors();
+                if (response.success) {
+                    setTutors(response.tutors);
+                }
+            } catch (error) {
+                console.error('Error loading tutors:', error);
+            }
+        };
+
+        loadTutors();
     }, []);
 
     // Filter the tutors based on the current state of the filters
@@ -132,7 +142,7 @@ const TutorList = () => {
                                     
                                     <p className="text-gray-600 mb-6 line-clamp-3">{tutor.bio}</p>
                                     
-                                    <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-full transition-colors transform hover:scale-105">
+                                    <button className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition-colors transform hover:scale-105">
                                         View Profile
                                     </button>
                                 </div>

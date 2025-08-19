@@ -56,7 +56,7 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24, // 24 hours
-    sameSite: 'strict'
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
   }
 }));
 
@@ -78,7 +78,12 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Database connection (optional - Redis sessions work independently)
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/livesession', {
+const dbName = process.env.DB_NAME || 'ethio-tutors';
+const mongoURI = process.env.MONGODB_URI 
+  ? process.env.MONGODB_URI.replace('mongodb.net/', `mongodb.net/${dbName}`)
+  : `mongodb://localhost:27017/${dbName}`;
+
+mongoose.connect(mongoURI, {
   serverSelectionTimeoutMS: 5000,
   socketTimeoutMS: 45000,
 })
@@ -97,7 +102,7 @@ app.use('/api/tutor-applications', tutorApplicationRoutes);
 app.use('/api/sessions', sessionRoutes);
 app.use('/api/disputes', disputeRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/uploads', uploadRoutes);
+app.use('/api/upload', uploadRoutes);
 app.use('/api/tutors', tutorRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/notifications', notificationRoutes);

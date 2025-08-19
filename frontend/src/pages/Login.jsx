@@ -60,6 +60,19 @@ const AuthModal = ({ onAuthSuccess, onClose }) => {
         buttonText = 'User';
     }
 
+    // State for form data and loading
+    const [formData, setFormData] = useState({ email: '', password: '' });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    // Handle input changes
+    const handleInputChange = (e) => {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value
+      });
+    };
+
     // A simple function to simulate a login and call the parent's onAuthSuccess handler
     const handleLogin = (e) => {
       e.preventDefault();
@@ -74,21 +87,48 @@ const AuthModal = ({ onAuthSuccess, onClose }) => {
           {role === 'admin' ? 'Admin Login' : (role === 'student' ? 'Student Login' : 'Tutor Login')}
         </h2>
         <p className="text-gray-500 mb-6">Please log in to your account.</p>
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            {error}
+          </div>
+        )}
         <div>
           <label htmlFor="login-email" className="block text-sm font-medium text-gray-700">Email Address</label>
-          <input type="email" id="login-email" className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150" placeholder="you@example.com" required />
+          <input 
+            type="email" 
+            id="login-email" 
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150" 
+            placeholder="you@example.com" 
+            required 
+          />
         </div>
         <div>
           <div className="flex justify-between items-center">
             <label htmlFor="login-password" className="block text-sm font-medium text-gray-700">Password</label>
             <a href="#" onClick={() => setCurrentForm('forgotPassword')} className="text-sm text-blue-600 hover:text-blue-500 transition duration-150">Forgot Password?</a>
           </div>
-          <input type="password" id="login-password" className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150" placeholder="********" required />
+          <input 
+            type="password" 
+            id="login-password" 
+            name="password"
+            value={formData.password}
+            onChange={handleInputChange}
+            className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150" 
+            placeholder="********" 
+            required 
+          />
         </div>
         <div>
           {/* Dynamically apply button colors based on the role */}
-          <button type="submit" className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-bold text-white ${buttonColor} focus:outline-none focus:ring-2 focus:ring-offset-2 transition duration-150`}>
-            Login as {buttonText}
+          <button 
+            type="submit" 
+            disabled={loading}
+            className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-bold text-white ${buttonColor} focus:outline-none focus:ring-2 focus:ring-offset-2 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed`}
+          >
+            {loading ? 'Logging in...' : `Login as ${buttonText}`}
           </button>
         </div>
         {/* The Sign Up link is now only shown if the role is not 'admin' */}

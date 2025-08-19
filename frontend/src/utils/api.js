@@ -1,5 +1,5 @@
 // API configuration and helper functions
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // No token management needed - using HttpOnly cookies
 
@@ -116,7 +116,7 @@ export const sessionAPI = {
 // Tutor Application API functions
 export const applicationAPI = {
   submitApplication: (applicationData) => 
-    apiRequest('/tutor-applications', {
+    apiRequest('/tutor-applications/submit', {
       method: 'POST',
       body: JSON.stringify(applicationData)
     }),
@@ -236,33 +236,6 @@ export const availabilityAPI = {
     })
 };
 
-// Room API functions
-export const roomAPI = {
-  createRoom: (roomData) => 
-    apiRequest('/rooms', {
-      method: 'POST',
-      body: JSON.stringify(roomData)
-    }),
-
-  joinRoom: (roomId) => 
-    apiRequest(`/rooms/${roomId}/join`, {
-      method: 'POST'
-    }),
-
-  leaveRoom: (roomId) => 
-    apiRequest(`/rooms/${roomId}/leave`, {
-      method: 'POST'
-    }),
-
-  getRoomDetails: (roomId) => 
-    apiRequest(`/rooms/${roomId}`),
-
-  sendMessage: (roomId, message) => 
-    apiRequest(`/rooms/${roomId}/messages`, {
-      method: 'POST',
-      body: JSON.stringify({ message })
-    })
-};
 
 // User management API functions
 export const userAPI = {
@@ -319,6 +292,51 @@ export const handleAPIError = (error) => {
   return error.message || 'An unexpected error occurred';
 };
 
+// Room API functions
+export const roomAPI = {
+  createRoom: (roomData) => 
+    apiRequest('/rooms/create', {
+      method: 'POST',
+      body: JSON.stringify(roomData)
+    }),
+
+  joinRoom: (roomId, password = null) => 
+    apiRequest(`/rooms/join/${roomId}`, {
+      method: 'POST',
+      body: JSON.stringify({ password })
+    }),
+
+  leaveRoom: (roomId) => 
+    apiRequest(`/rooms/leave/${roomId}`, {
+      method: 'POST'
+    }),
+
+  getRoomDetails: (roomId) => 
+    apiRequest(`/rooms/${roomId}`),
+
+  getUserRooms: () => 
+    apiRequest('/rooms/user/rooms'),
+
+  addChatMessage: (roomId, message) => 
+    apiRequest(`/rooms/${roomId}/chat`, {
+      method: 'POST',
+      body: JSON.stringify({ message })
+    }),
+
+  // Session tracking
+  startSessionTracking: (roomId) => 
+    apiRequest(`/rooms/${roomId}/start-tracking`, {
+      method: 'POST'
+    }),
+
+  endSessionTracking: (roomId, duration) => 
+    apiRequest(`/rooms/${roomId}/end-tracking`, {
+      method: 'POST',
+      body: JSON.stringify({ duration })
+    }),
+
+};
+
 export default {
   authAPI,
   tutorAPI,
@@ -329,8 +347,8 @@ export default {
   notificationAPI,
   statsAPI,
   availabilityAPI,
-  roomAPI,
   userAPI,
+  roomAPI,
   uploadFile,
   handleAPIError
 };

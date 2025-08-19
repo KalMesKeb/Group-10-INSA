@@ -1,5 +1,7 @@
 // Session-based authentication middleware
 import User from '../models/User.js';
+import Tutor from '../models/Tutor.js';
+import Admin from '../models/Admin.js';
 
 // Authentication middleware for session-based auth
 export const authenticateSession = async (req, res, next) => {
@@ -12,8 +14,18 @@ export const authenticateSession = async (req, res, next) => {
       });
     }
 
-    // Get user from database to ensure they still exist and are active
-    const user = await User.findById(req.session.userId).select('role isActive');
+    // Get user from database across all collections
+    let user = await User.findById(req.session.userId).select('isActive');
+    let userRole = 'student';
+    
+    if (!user) {
+      user = await Tutor.findById(req.session.userId).select('isActive');
+      userRole = 'tutor';
+    }
+    if (!user) {
+      user = await Admin.findById(req.session.userId).select('isActive');
+      userRole = 'admin';
+    }
     
     if (!user) {
       // User no longer exists, destroy session
@@ -36,7 +48,7 @@ export const authenticateSession = async (req, res, next) => {
     // Attach user info to request object
     req.user = {
       id: user._id,
-      role: user.role
+      role: userRole
     };
 
     next();

@@ -323,4 +323,67 @@ router.post('/:roomId/chat', authenticateSession, [
   }
 });
 
+// Start session tracking
+router.post('/:roomId/start-tracking', authenticateSession, async (req, res) => {
+  try {
+    const { roomId } = req.params;
+
+    const room = await Room.findOne({ roomId });
+    if (!room) {
+      return res.status(404).json({
+        success: false,
+        message: 'Room not found'
+      });
+    }
+
+    room.sessionStartTime = new Date();
+    await room.save();
+
+    res.json({
+      success: true,
+      message: 'Session tracking started',
+      startTime: room.sessionStartTime
+    });
+  } catch (error) {
+    console.error('Start session tracking error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while starting session tracking'
+    });
+  }
+});
+
+// End session tracking
+router.post('/:roomId/end-tracking', authenticateSession, async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    const { duration } = req.body;
+
+    const room = await Room.findOne({ roomId });
+    if (!room) {
+      return res.status(404).json({
+        success: false,
+        message: 'Room not found'
+      });
+    }
+
+    room.sessionDuration = duration;
+    room.sessionEndTime = new Date();
+    await room.save();
+
+    res.json({
+      success: true,
+      message: 'Session tracking ended',
+      duration: room.sessionDuration
+    });
+  } catch (error) {
+    console.error('End session tracking error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while ending session tracking'
+    });
+  }
+});
+
+
 export default router;

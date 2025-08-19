@@ -1,12 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
+import { roomAPI } from '../utils/api.js';
 
-// This is a self-contained component, so we'll re-include the script
-const PeerJS = `
-<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
-`;
-
- const LiveSessionRoom = ({ sessionRoomId, onLeave }) => {
+const LiveSessionRoom = ({ sessionRoomId, onLeave }) => {
   const [roomId, setRoomId] = useState('');
   const [peerId, setPeerId] = useState('');
   const [localStream, setLocalStream] = useState(null);
@@ -17,11 +13,18 @@ const PeerJS = `
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [showChat, setShowChat] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  
+  // Session tracking states
+  const [sessionStartTime, setSessionStartTime] = useState(null);
+  const [sessionDuration, setSessionDuration] = useState(0);
+  
+  const [roomData, setRoomData] = useState(null);
 
   const peerInstance = useRef(null);
   const myVideoRef = useRef(null);
   const remoteVideoRefs = useRef({});
   const connections = useRef({});
+  const sessionTimerRef = useRef(null);
 
   // Error modal state
   const [showErrorModal, setShowErrorModal] = useState(false);
@@ -44,7 +47,6 @@ const PeerJS = `
     );
   };
 
-  // Helper function to show a custom error modal
   const handleShowError = (message) => {
     setErrorMessage(message);
     setShowErrorModal(true);
@@ -58,11 +60,16 @@ const PeerJS = `
     if (peerInstance.current) {
       peerInstance.current.destroy();
     }
+    if (sessionTimerRef.current) {
+      clearInterval(sessionTimerRef.current);
+    }
     setLocalStream(null);
     setRemoteStreams({});
     setChatMessages([]);
     setIsJoined(false);
     setPeerId('');
+    setSessionStartTime(null);
+    setSessionDuration(0);
   };
 
   useEffect(() => {
@@ -157,73 +164,156 @@ const PeerJS = `
     }
   };
   
-  const connectToPeers = (room, stream) => {
-    const peersInRoom = JSON.parse(localStorage.getItem(room) || '[]');
-    peersInRoom.forEach(remotePeerId => {
-      if (remotePeerId !== peerId) {
-        console.log(`Calling peer: ${remotePeerId}`);
-        const call = peerInstance.current.call(remotePeerId, stream);
-        
-        call.on('stream', (remoteStream) => {
-          console.log('Received remote stream from call:', remotePeerId);
-          setRemoteStreams(prev => ({
-            ...prev,
-            [remotePeerId]: remoteStream
-          }));
-        });
-        
-        const conn = peerInstance.current.connect(remotePeerId);
-        conn.on('open', () => {
-          console.log(`Data connection opened with ${remotePeerId}`);
-          connections.current[remotePeerId] = conn;
-        });
+  // Session tracking functions
+  const startSessionTimer = () => {
+    const startTime = new Date();
+    setSessionStartTime(startTime);
+    
+    sessionTimerRef.current = setInterval(() => {
+      const now = new Date();
+      const duration = Math.floor((now - startTime) / 1000);
+      setSessionDuration(duration);
+    }, 1000);
+  };
+
+  const stopSessionTimer = async () => {
+    if (sessionTimerRef.current) {
+      clearInterval(sessionTimerRef.current);
+    }
+    
+    if (roomId && sessionDuration > 0) {
+      try {
+        await roomAPI.endSessionTracking(roomId, sessionDuration);
+      } catch (error) {
+        console.error('Failed to save session duration:', error);
       }
-    });
+    }
+  };
+
+
+  const connectToPeers = async (room, stream) => {
+    try {
+      const roomData = await roomAPI.getRoomDetails(room);
+      setRoomData(roomData.room);
+      setChatMessages(roomData.room.chatHistory || []);
+      
+      // Connect to existing peers in the room
+      const participants = roomData.room.participants || [];
+      participants.forEach(participant => {
+        const remotePeerId = participant.peerId;
+        if (remotePeerId && remotePeerId !== peerId) {
+          console.log(`Calling peer: ${remotePeerId}`);
+          const call = peerInstance.current.call(remotePeerId, stream);
+          
+          call.on('stream', (remoteStream) => {
+            console.log('Received remote stream from call:', remotePeerId);
+            setRemoteStreams(prev => ({
+              ...prev,
+              [remotePeerId]: remoteStream
+            }));
+          });
+          
+          const conn = peerInstance.current.connect(remotePeerId);
+          conn.on('open', () => {
+            console.log(`Data connection opened with ${remotePeerId}`);
+            connections.current[remotePeerId] = conn;
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Failed to connect to room:', error);
+      // Fallback to localStorage for backward compatibility
+      const peersInRoom = JSON.parse(localStorage.getItem(room) || '[]');
+      peersInRoom.forEach(remotePeerId => {
+        if (remotePeerId !== peerId) {
+          console.log(`Calling peer: ${remotePeerId}`);
+          const call = peerInstance.current.call(remotePeerId, stream);
+          
+          call.on('stream', (remoteStream) => {
+            console.log('Received remote stream from call:', remotePeerId);
+            setRemoteStreams(prev => ({
+              ...prev,
+              [remotePeerId]: remoteStream
+            }));
+          });
+          
+          const conn = peerInstance.current.connect(remotePeerId);
+          conn.on('open', () => {
+            console.log(`Data connection opened with ${remotePeerId}`);
+            connections.current[remotePeerId] = conn;
+          });
+        }
+      });
+    }
   };
 
   const handleCreateRoom = async () => {
-    const newRoomId = `room-${crypto.randomUUID()}`;
-    setRoomId(newRoomId);
+    try {
+      const roomData = {
+        name: `Live Session ${new Date().toLocaleString()}`,
+        description: 'Live tutoring session',
+        maxParticipants: 10
+      };
+      
+      const response = await roomAPI.createRoom(roomData);
+      const newRoomId = response.room.roomId;
+      setRoomId(newRoomId);
+      setRoomData(response.room);
 
-    const stream = await getLocalStream();
-    if (stream) {
-      localStorage.setItem(newRoomId, JSON.stringify([peerId]));
-      setIsJoined(true);
-      connectToPeers(newRoomId, stream);
+      const stream = await getLocalStream();
+      if (stream) {
+        setIsJoined(true);
+        startSessionTimer();
+        await connectToPeers(newRoomId, stream);
+      }
+    } catch (error) {
+      console.error('Failed to create room:', error);
+      handleShowError('Failed to create room. Please try again.');
     }
   };
 
   const handleJoinRoom = async (joinRoomId) => {
-    const stream = await getLocalStream();
-    if (stream) {
-      const peersInRoom = JSON.parse(localStorage.getItem(joinRoomId) || '[]');
-      if (peersInRoom.length === 0) {
-        // If the room doesn't exist, we assume we are the first person
-        // to arrive and create it.
-        localStorage.setItem(joinRoomId, JSON.stringify([peerId]));
-      } else {
-        // If the room exists, add our peerId to it.
-        peersInRoom.push(peerId);
-        localStorage.setItem(joinRoomId, JSON.stringify(peersInRoom));
+    try {
+      const response = await roomAPI.joinRoom(joinRoomId);
+      setRoomData(response.room);
+      
+      const stream = await getLocalStream();
+      if (stream) {
+        setIsJoined(true);
+        startSessionTimer();
+        await connectToPeers(joinRoomId, stream);
       }
-      setIsJoined(true);
-      connectToPeers(joinRoomId, stream);
+    } catch (error) {
+      console.error('Failed to join room:', error);
+      handleShowError('Failed to join room. Please check the room ID and try again.');
     }
   };
 
-  const removePeerFromRoom = (room, peerId) => {
-    const peersInRoom = JSON.parse(localStorage.getItem(room) || '[]').filter(id => id !== peerId);
-    localStorage.setItem(room, JSON.stringify(peersInRoom));
+  const removePeerFromRoom = async (room, peerId) => {
+    try {
+      await roomAPI.leaveRoom(room);
+    } catch (error) {
+      console.error('Failed to leave room via API:', error);
+      // Fallback to localStorage
+      const peersInRoom = JSON.parse(localStorage.getItem(room) || '[]').filter(id => id !== peerId);
+      localStorage.setItem(room, JSON.stringify(peersInRoom));
+    }
   };
   
-  const handleLeaveRoom = () => {
+  const handleLeaveRoom = async () => {
     console.log('Leaving room...');
+    
+    await stopSessionTimer();
+    
     if (localStream) {
       localStream.getTracks().forEach(track => track.stop());
     }
-    peerInstance.current.disconnect();
-    peerInstance.current.destroy();
-    removePeerFromRoom(roomId, peerId);
+    if (peerInstance.current) {
+      peerInstance.current.disconnect();
+      peerInstance.current.destroy();
+    }
+    
+    await removePeerFromRoom(roomId, peerId);
     cleanup();
     onLeave(); // Call the prop function to navigate back to the dashboard
   };
@@ -263,19 +353,35 @@ const PeerJS = `
     const [message, setMessage] = useState('');
     const chatRef = useRef(null);
 
-    const handleSendMessage = (e) => {
+    const handleSendMessage = async (e) => {
       e.preventDefault();
       if (!message.trim()) return;
 
-      const chatMsg = { sender: peerId, text: message, timestamp: new Date().toLocaleTimeString() };
-      setChatMessages(prev => [...prev, chatMsg]);
-
-      Object.values(connections.current).forEach(conn => {
-        if (conn.open) {
-          conn.send(chatMsg);
-        }
-      });
-      setMessage('');
+      try {
+        const response = await roomAPI.addChatMessage(roomId, message.trim());
+        const chatMsg = response.chatMessage;
+        setChatMessages(prev => [...prev, chatMsg]);
+        
+        // Also send via P2P for real-time delivery
+        Object.values(connections.current).forEach(conn => {
+          if (conn.open) {
+            conn.send(chatMsg);
+          }
+        });
+        
+        setMessage('');
+      } catch (error) {
+        console.error('Failed to send message:', error);
+        // Fallback to P2P only
+        const chatMsg = { sender: peerId, text: message, timestamp: new Date().toLocaleTimeString() };
+        setChatMessages(prev => [...prev, chatMsg]);
+        Object.values(connections.current).forEach(conn => {
+          if (conn.open) {
+            conn.send(chatMsg);
+          }
+        });
+        setMessage('');
+      }
     };
 
     useEffect(() => {
@@ -370,8 +476,18 @@ const PeerJS = `
     <div className="min-h-screen flex flex-col bg-gray-900 text-white">
       {showErrorModal && <ErrorModal message={errorMessage} onClose={() => setShowErrorModal(false)} />}
       <header className="p-4 bg-gray-800 shadow-lg flex justify-between items-center z-10">
-        <h2 className="text-xl font-bold text-indigo-400">Room: {sessionRoomId}</h2>
-        <div className="flex space-x-4">
+        <div className="flex flex-col">
+          <h2 className="text-xl font-bold text-indigo-400">Room: {sessionRoomId || roomId}</h2>
+          {sessionStartTime && (
+            <div className="flex items-center space-x-4 text-sm text-gray-300 mt-1">
+              <span>Duration: {Math.floor(sessionDuration / 60)}:{(sessionDuration % 60).toString().padStart(2, '0')}</span>
+              {roomData && (
+                <span>Participants: {roomData.participants?.length || 0}/{roomData.maxParticipants || 10}</span>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="flex space-x-2">
           <button
             onClick={toggleMute}
             className={`p-3 rounded-full transition-colors ${isMuted ? 'bg-red-600' : 'bg-gray-700 hover:bg-gray-600'}`}
@@ -414,45 +530,48 @@ const PeerJS = `
       </header>
       
       <div className="flex flex-1 overflow-hidden p-4">
-        <div className="flex-1 flex flex-col md:flex-row gap-4">
-          <div className="flex-1 flex flex-col md:flex-row gap-4 overflow-auto p-2">
-            {/* My Video */}
-            <div className="relative flex-1 bg-gray-800 rounded-xl overflow-hidden shadow-xl min-h-[200px]">
-              <video
-                ref={myVideoRef}
-                autoPlay
-                playsInline
-                muted
-                className="w-full h-full object-cover rounded-xl"
-              ></video>
-              <div className="absolute bottom-4 left-4 bg-gray-900 bg-opacity-50 text-white px-3 py-1 rounded-full font-semibold text-sm">
-                You
-              </div>
-            </div>
-            
-            {/* Remote Videos */}
-            {Object.keys(remoteStreams).map(peerId => (
-              <div key={peerId} className="relative flex-1 bg-gray-800 rounded-xl overflow-hidden shadow-xl min-h-[200px]">
+        <div className="flex-1 flex flex-col gap-4">
+          
+          <div className="flex-1 flex flex-col md:flex-row gap-4">
+            <div className="flex-1 flex flex-col md:flex-row gap-4 overflow-auto p-2">
+              {/* My Video */}
+              <div className="relative flex-1 bg-gray-800 rounded-xl overflow-hidden shadow-xl min-h-[200px]">
                 <video
-                  ref={el => remoteVideoRefs.current[peerId] = el}
+                  ref={myVideoRef}
                   autoPlay
                   playsInline
+                  muted
                   className="w-full h-full object-cover rounded-xl"
                 ></video>
                 <div className="absolute bottom-4 left-4 bg-gray-900 bg-opacity-50 text-white px-3 py-1 rounded-full font-semibold text-sm">
-                  Peer {peerId.substring(6, 12)}
+                  You
                 </div>
               </div>
-            ))}
+              
+              {/* Remote Videos */}
+              {Object.keys(remoteStreams).map(peerId => (
+                <div key={peerId} className="relative flex-1 bg-gray-800 rounded-xl overflow-hidden shadow-xl min-h-[200px]">
+                  <video
+                    ref={el => remoteVideoRefs.current[peerId] = el}
+                    autoPlay
+                    playsInline
+                    className="w-full h-full object-cover rounded-xl"
+                  ></video>
+                  <div className="absolute bottom-4 left-4 bg-gray-900 bg-opacity-50 text-white px-3 py-1 rounded-full font-semibold text-sm">
+                    Peer {peerId.substring(6, 12)}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Chat Panel */}
+            {showChat && (
+              <div className="w-full md:w-80 h-full md:h-auto flex-shrink-0 mt-4 md:mt-0 md:ml-4">
+                <Chat />
+              </div>
+            )}
           </div>
         </div>
-        
-        {/* Chat Panel */}
-        {showChat && (
-          <div className="w-full md:w-80 h-full md:h-auto flex-shrink-0 mt-4 md:mt-0 md:ml-4">
-            <Chat />
-          </div>
-        )}
       </div>
     </div>
   );
@@ -460,10 +579,4 @@ const PeerJS = `
 
 
 
-// Main entry point for the React app
-const domNode = document.getElementById('root');
-if (domNode) {
-  const root = createRoot(domNode);
-  root.render(<LiveSessionRoom />);
-}
 export default LiveSessionRoom;

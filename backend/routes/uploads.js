@@ -1,5 +1,5 @@
 import express from 'express';
-import { uploadTutorFiles, uploadEvidence, handleUploadError } from '../middleware/upload.js';
+import { uploadTutorFiles, uploadEvidence, uploadGeneral, handleUploadError } from '../middleware/upload.js';
 import { authenticateSession } from '../middleware/session.js';
 import { v2 as cloudinary } from 'cloudinary';
 import User from '../models/User.js';
@@ -15,6 +15,59 @@ const uploadToCloudinary = (buffer, options) => {
     }).end(buffer);
   });
 };
+
+// General upload endpoint for frontend
+router.post('/', authenticateSession, uploadGeneral, handleUploadError, async (req, res) => {
+  try {
+    const { type } = req.body;
+    const file = req.file;
+    
+    if (!file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file provided'
+      });
+    }
+
+    let uploadOptions = {
+      folder: 'ethio-education/general'
+    };
+
+    // Configure upload based on type
+    if (type === 'profile') {
+      uploadOptions = {
+        folder: 'ethio-education/profiles',
+        resource_type: 'image',
+        transformation: [{ width: 500, height: 500, crop: 'limit', quality: 'auto' }]
+      };
+    } else if (type === 'demo') {
+      uploadOptions = {
+        folder: 'ethio-education/videos',
+        resource_type: 'video'
+      };
+    } else if (type === 'evidence') {
+      uploadOptions = {
+        folder: 'ethio-education/evidence',
+        resource_type: 'auto'
+      };
+    }
+
+    const result = await uploadToCloudinary(file.buffer, uploadOptions);
+
+    res.json({
+      success: true,
+      message: 'File uploaded successfully',
+      url: result.secure_url,
+      publicId: result.public_id
+    });
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while uploading file'
+    });
+  }
+});
 
 // Upload tutor application files (profile picture + demo video)
 router.post('/tutor-files', authenticateSession, uploadTutorFiles, handleUploadError, async (req, res) => {

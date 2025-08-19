@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { FaCalendarCheck, FaCalendarAlt, FaUserCircle, FaBook, FaClock } from 'react-icons/fa';
-import { bookedSessions } from './dataStore';
+import { sessionAPI } from '../utils/api';
 
 // Main component for the Tutor Dashboard
 const TutorDashboard = ({ loggedInUser, joinLiveSession }) => {
@@ -10,14 +10,41 @@ const TutorDashboard = ({ loggedInUser, joinLiveSession }) => {
     const [activeView, setActiveView] = useState('sessions'); // State to control which main view is active
     const [bookedDays, setBookedDays] = useState(new Set());
 
+    // Don't render if user is not logged in or not a tutor
+    if (!loggedInUser || loggedInUser.role !== 'tutor') {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Access Denied</h2>
+                    <p className="text-gray-600">Please log in as a tutor to access this dashboard.</p>
+                </div>
+            </div>
+        );
+    }
+
     useEffect(() => {
-        // Filter booked sessions to show only those for the logged-in tutor
-        if (loggedInUser && loggedInUser.role === 'tutor') {
-            const tutorSessions = bookedSessions.filter(session => session.tutorName === loggedInUser.name);
-            setScheduledSessions(tutorSessions);
-        } else {
-            setScheduledSessions([]);
+        // Only proceed if user is properly authenticated as a tutor
+        if (!loggedInUser || loggedInUser.role !== 'tutor') {
+            return;
         }
+
+        const loadTutorSessions = async () => {
+            try {
+                const response = await sessionAPI.getUserSessions();
+                if (response.success) {
+                    setScheduledSessions(response.sessions);
+                }
+            } catch (error) {
+                // Silently handle authentication errors during login process
+                if (error.message === 'Authentication required') {
+                    // Session not yet established, will retry on next render
+                    return;
+                }
+                console.error('Error loading tutor sessions:', error);
+            }
+        };
+
+        loadTutorSessions();
     }, [loggedInUser]);
 
     // This effect runs whenever scheduledSessions changes to update the calendar

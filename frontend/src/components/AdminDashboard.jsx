@@ -1,57 +1,98 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar'; // Import the new Sidebar component
-import { tutorApplications, userAccounts, disputes, approveTutor, rejectTutor, bookedSessions } from './dataStore';
+import { applicationAPI, userAPI, disputeAPI, sessionAPI } from '../utils/api';
 import { FaExclamationTriangle, FaRegCalendarCheck, FaChalkboardTeacher, FaUsers } from 'react-icons/fa';
 
 const AdminDashboard = () => {
-    const [activeSection, setActiveSection] = useState('bookedSessions'); // State to track the active section
-    const [tutorApplicationsState, setTutorApplicationsState] = useState(tutorApplications);
-    const [disputesState, setDisputesState] = useState(disputes);
-    const [userAccountsState, setUserAccountsState] = useState(userAccounts);
+    const [activeSection, setActiveSection] = useState('bookedSessions');
+    const [tutorApplicationsState, setTutorApplicationsState] = useState([]);
+    const [disputesState, setDisputesState] = useState([]);
+    const [userAccountsState, setUserAccountsState] = useState([]);
     const [selectedApplication, setSelectedApplication] = useState(null);
-    const [bookedSessionsState, setBookedSessionsState] = useState(bookedSessions);
+    const [bookedSessionsState, setBookedSessionsState] = useState([]);
 
     useEffect(() => {
-        setTutorApplicationsState([...tutorApplications]);
-        setUserAccountsState([...userAccounts]);
-        setDisputesState([...disputes]);
-        setBookedSessionsState([...bookedSessions]);
-    }, [tutorApplications, userAccounts, disputes, bookedSessions]);
+        const loadAdminData = async () => {
+            try {
+                // Load tutor applications
+                const applicationsResponse = await applicationAPI.getAllApplications();
+                if (applicationsResponse.success) {
+                    setTutorApplicationsState(applicationsResponse.applications);
+                }
 
-    const handleApprove = (id) => {
-        approveTutor(id);
-        setTutorApplicationsState([...tutorApplications]);
-        setUserAccountsState([...userAccounts]);
-        setSelectedApplication(null);
-    };
+                // Load user accounts
+                const usersResponse = await userAPI.getAllUsers();
+                if (usersResponse.success) {
+                    setUserAccountsState(usersResponse.users);
+                }
 
-    const handleReject = (id) => {
-        rejectTutor(id);
-        setTutorApplicationsState([...tutorApplications]);
-        setSelectedApplication(null);
-    };
+                // Load disputes
+                const disputesResponse = await disputeAPI.getAllDisputes();
+                if (disputesResponse.success) {
+                    setDisputesState(disputesResponse.disputes);
+                }
 
-    const handleResolveDispute = (id) => {
-        const index = disputes.findIndex(d => d.id === id);
-        if (index !== -1) {
-            disputes.splice(index, 1);
+                // Load booked sessions
+                const sessionsResponse = await sessionAPI.getUserSessions();
+                if (sessionsResponse.success) {
+                    setBookedSessionsState(sessionsResponse.sessions);
+                }
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+            }
+        };
+
+        loadAdminData();
+    }, []);
+
+    const handleApprove = async (id) => {
+        try {
+            await applicationAPI.updateApplicationStatus(id, 'approved');
+            setTutorApplicationsState(prev => prev.filter(app => app.id !== id));
+            setSelectedApplication(null);
+        } catch (error) {
+            console.error('Error approving application:', error);
         }
-        setDisputesState([...disputes]);
     };
 
-    const handleSuspendAccount = (id) => {
-        const user = userAccountsState.find(u => u.id === id);
-        if (user) {
-            user.status = 'Suspended';
-            setUserAccountsState([...userAccounts]);
+    const handleReject = async (id) => {
+        try {
+            await applicationAPI.updateApplicationStatus(id, 'rejected');
+            setTutorApplicationsState(prev => prev.filter(app => app.id !== id));
+            setSelectedApplication(null);
+        } catch (error) {
+            console.error('Error rejecting application:', error);
         }
     };
 
-    const handleUnsuspendAccount = (id) => {
-        const user = userAccountsState.find(u => u.id === id);
-        if (user) {
-            user.status = 'Active';
-            setUserAccountsState([...userAccounts]);
+    const handleResolveDispute = async (id) => {
+        try {
+            await disputeAPI.updateDisputeStatus(id, 'resolved');
+            setDisputesState(prev => prev.filter(dispute => dispute.id !== id));
+        } catch (error) {
+            console.error('Error resolving dispute:', error);
+        }
+    };
+
+    const handleSuspendAccount = async (id) => {
+        try {
+            await userAPI.updateUserStatus(id, 'suspended');
+            setUserAccountsState(prev => prev.map(user => 
+                user.id === id ? { ...user, status: 'Suspended' } : user
+            ));
+        } catch (error) {
+            console.error('Error suspending account:', error);
+        }
+    };
+
+    const handleUnsuspendAccount = async (id) => {
+        try {
+            await userAPI.updateUserStatus(id, 'active');
+            setUserAccountsState(prev => prev.map(user => 
+                user.id === id ? { ...user, status: 'Active' } : user
+            ));
+        } catch (error) {
+            console.error('Error unsuspending account:', error);
         }
     };
 
