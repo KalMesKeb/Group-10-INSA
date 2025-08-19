@@ -86,7 +86,7 @@ const DisputeReport = () => {
                 animate={{ opacity: 1 }}
                 className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 p-6"
             >
-                <div className="bg-white p-12 rounded-2xl shadow-xl max-w-xl text-center border-t-4 border-indigo-500 transform transition-all hover:shadow-2xl">
+                <div className="bg-white p-12 rounded-2xl shadow-xl max-w-xl text-center border-t-4 border-indigo-500 transform transition-all hover:shadow-2xl mt-20">
                     <motion.div
                         initial={{ scale: 0.5 }}
                         animate={{ scale: 1 }}
