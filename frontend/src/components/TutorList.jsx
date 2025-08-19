@@ -132,7 +132,7 @@ const TutorList = () => {
                                     
                                     <p className="text-gray-600 mb-6 line-clamp-3">{tutor.bio}</p>
                                     
-                                    <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-full transition-colors transform hover:scale-105">
+                                    <button className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition-colors transform hover:scale-105">
                                         View Profile
                                     </button>
                                 </div>

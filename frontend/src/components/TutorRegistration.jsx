@@ -1,4 +1,3 @@
-// src/components/TutorRegistration.jsx
 import React, { useState } from 'react';
 import { addTutorApplication } from './dataStore';
 
@@ -105,26 +104,24 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
             },
         };
 
-        // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 1500));
-        
         addTutorApplication(newApplication);
         onRegistrationSuccess(newApplication.profileData);
         setIsSubmitting(false);
     };
 
     const renderStep = () => {
-        const inputStyle = "shadow-sm appearance-none border border-gray-200 rounded-xl w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300";
+        const inputStyle = "shadow-sm appearance-none border border-gray-200 rounded-xl w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300";
         const labelStyle = "block text-gray-700 text-sm font-semibold mb-2";
         const buttonStyle = "font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 hover:shadow-xl transform hover:scale-[1.02] active:scale-95";
 
         switch (step) {
             case 1:
                 return (
-                    <div className="bg-gradient-to-br from-white to-indigo-50 p-10 rounded-2xl shadow-xl border border-indigo-100">
+                    <div className="bg-gradient-to-br from-white to-emerald-50 p-10 rounded-2xl shadow-xl border border-emerald-100">
                         <div className="flex items-center mb-8">
-                            <div className="bg-indigo-100 text-indigo-700 rounded-full w-10 h-10 flex items-center justify-center mr-4 font-bold">1</div>
-                            <h3 className="text-3xl font-bold text-indigo-800">Personal Details</h3>
+                            <div className="bg-emerald-100 text-emerald-700 rounded-full w-10 h-10 flex items-center justify-center mr-4 font-bold">1</div>
+                            <h3 className="text-3xl font-bold text-emerald-800">Personal Details</h3>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-4">
@@ -168,7 +165,7 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
                                         alert('Please fill out all required fields.');
                                     }
                                 }} 
-                                className={`${buttonStyle} bg-gradient-to-r from-indigo-500 to-indigo-600 text-white hover:from-indigo-600 hover:to-indigo-700`}
+                                className={`${buttonStyle} bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700`}
                             >
                                 Next <span className="ml-2">→</span>
                             </button>
@@ -177,10 +174,10 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
                 );
             case 2:
                 return (
-                    <div className="bg-gradient-to-br from-white to-indigo-50 p-10 rounded-2xl shadow-xl border border-indigo-100">
+                    <div className="bg-gradient-to-br from-white to-emerald-50 p-10 rounded-2xl shadow-xl border border-emerald-100">
                         <div className="flex items-center mb-8">
-                            <div className="bg-indigo-100 text-indigo-700 rounded-full w-10 h-10 flex items-center justify-center mr-4 font-bold">2</div>
-                            <h3 className="text-3xl font-bold text-indigo-800">Credentials & Experience</h3>
+                            <div className="bg-emerald-100 text-emerald-700 rounded-full w-10 h-10 flex items-center justify-center mr-4 font-bold">2</div>
+                            <h3 className="text-3xl font-bold text-emerald-800">Credentials & Experience</h3>
                         </div>
 
                         <div className="mb-8 p-6 bg-white rounded-xl shadow-sm border border-gray-100">
@@ -189,7 +186,7 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
                                 <button 
                                     type="button" 
                                     onClick={() => addToArray('education', { degree: '', institution: '' })} 
-                                    className="ml-auto bg-gradient-to-r from-purple-500 to-purple-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 hover:shadow-md"
+                                    className="ml-auto bg-gradient-to-r from-green-500 to-green-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 hover:shadow-md"
                                 >
                                     + Add Education
                                 </button>
@@ -228,7 +225,7 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
                                 <button 
                                     type="button" 
                                     onClick={() => addToArray('workExperience', { role: '', company: '' })} 
-                                    className="ml-auto bg-gradient-to-r from-purple-500 to-purple-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 hover:shadow-md"
+                                    className="ml-auto bg-gradient-to-r from-green-500 to-green-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 hover:shadow-md"
                                 >
                                     + Add Experience
                                 </button>
@@ -272,7 +269,7 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
                             <button 
                                 type="button" 
                                 onClick={() => setStep(3)} 
-                                className={`${buttonStyle} bg-gradient-to-r from-indigo-500 to-indigo-600 text-white hover:from-indigo-600 hover:to-indigo-700`}
+                                className={`${buttonStyle} bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700`}
                             >
                                 Next <span className="ml-2">→</span>
                             </button>
@@ -281,10 +278,10 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
                 );
             case 3:
                 return (
-                    <div className="bg-gradient-to-br from-white to-indigo-50 p-10 rounded-2xl shadow-xl border border-indigo-100">
+                    <div className="bg-gradient-to-br from-white to-emerald-50 p-10 rounded-2xl shadow-xl border border-emerald-100">
                         <div className="flex items-center mb-8">
-                            <div className="bg-indigo-100 text-indigo-700 rounded-full w-10 h-10 flex items-center justify-center mr-4 font-bold">3</div>
-                            <h3 className="text-3xl font-bold text-indigo-800">Subjects & Availability</h3>
+                            <div className="bg-emerald-100 text-emerald-700 rounded-full w-10 h-10 flex items-center justify-center mr-4 font-bold">3</div>
+                            <h3 className="text-3xl font-bold text-emerald-800">Subjects & Availability</h3>
                         </div>
 
                         <div className="mb-8 p-6 bg-white rounded-xl shadow-sm border border-gray-100">
@@ -295,13 +292,13 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
                                         key={subject} 
                                         className={`inline-flex items-center p-3 rounded-lg cursor-pointer transition-colors duration-200 ${
                                             formData.subjects.includes(subject) 
-                                                ? 'bg-indigo-100 border border-indigo-300' 
+                                                ? 'bg-emerald-100 border border-emerald-300' 
                                                 : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
                                         }`}
                                     >
                                         <input
                                             type="checkbox"
-                                            className="form-checkbox h-5 w-5 text-indigo-600 rounded"
+                                            className="form-checkbox h-5 w-5 text-emerald-600 rounded"
                                             value={subject}
                                             checked={formData.subjects.includes(subject)}
                                             onChange={handleSubjectChange}
@@ -358,7 +355,7 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
                                         alert('Please fill out all required fields.');
                                     }
                                 }} 
-                                className={`${buttonStyle} bg-gradient-to-r from-indigo-500 to-indigo-600 text-white hover:from-indigo-600 hover:to-indigo-700`}
+                                className={`${buttonStyle} bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700`}
                             >
                                 Next <span className="ml-2">→</span>
                             </button>
@@ -367,10 +364,10 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
                 );
             case 4:
                 return (
-                    <div className="bg-gradient-to-br from-white to-indigo-50 p-10 rounded-2xl shadow-xl border border-indigo-100">
+                    <div className="bg-gradient-to-br from-white to-emerald-50 p-10 rounded-2xl shadow-xl border border-emerald-100">
                         <div className="flex items-center mb-8">
-                            <div className="bg-indigo-100 text-indigo-700 rounded-full w-10 h-10 flex items-center justify-center mr-4 font-bold">4</div>
-                            <h3 className="text-3xl font-bold text-indigo-800">Profile & Introduction</h3>
+                            <div className="bg-emerald-100 text-emerald-700 rounded-full w-10 h-10 flex items-center justify-center mr-4 font-bold">4</div>
+                            <h3 className="text-3xl font-bold text-emerald-800">Profile & Introduction</h3>
                         </div>
 
                         <div className="mb-8 p-6 bg-white rounded-xl shadow-sm border border-gray-100">
@@ -405,7 +402,7 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
                                             )}
                                         </div>
                                         <div>
-                                            <div className="bg-indigo-50 text-indigo-700 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-indigo-100">
+                                            <div className="bg-emerald-50 text-emerald-700 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-emerald-100">
                                                 {formData.profilePic ? 'Change Photo' : 'Upload Photo'}
                                             </div>
                                             {formData.profilePic && (
@@ -435,7 +432,7 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
                             <button 
                                 type="button" 
                                 onClick={() => setStep(5)} 
-                                className={`${buttonStyle} bg-gradient-to-r from-indigo-500 to-indigo-600 text-white hover:from-indigo-600 hover:to-indigo-700`}
+                                className={`${buttonStyle} bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700`}
                             >
                                 Next <span className="ml-2">→</span>
                             </button>
@@ -444,10 +441,10 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
                 );
             case 5:
                 return (
-                    <div className="bg-gradient-to-br from-white to-indigo-50 p-10 rounded-2xl shadow-xl border border-indigo-100">
+                    <div className="bg-gradient-to-br from-white to-emerald-50 p-10 rounded-2xl shadow-xl border border-emerald-100">
                         <div className="flex items-center mb-8">
-                            <div className="bg-indigo-100 text-indigo-700 rounded-full w-10 h-10 flex items-center justify-center mr-4 font-bold">5</div>
-                            <h3 className="text-3xl font-bold text-indigo-800">Final Step: Video Introduction</h3>
+                            <div className="bg-emerald-100 text-emerald-700 rounded-full w-10 h-10 flex items-center justify-center mr-4 font-bold">5</div>
+                            <h3 className="text-3xl font-bold text-emerald-800">Final Step: Video Introduction</h3>
                         </div>
                         
                         <div className="mb-8 p-6 bg-white rounded-xl shadow-sm border border-gray-100">
@@ -470,21 +467,21 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
                                         <button 
                                             type="button" 
                                             onClick={() => document.getElementById('demoVideo').click()} 
-                                            className="bg-indigo-50 text-indigo-700 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-indigo-100"
+                                            className="bg-emerald-50 text-emerald-700 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-emerald-100"
                                         >
                                             Change Video
                                         </button>
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-indigo-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-emerald-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                         </svg>
                                         <p className="text-gray-600 mb-4">Upload a 1-minute video introducing yourself</p>
                                         <button 
                                             type="button" 
                                             onClick={() => document.getElementById('demoVideo').click()} 
-                                            className="bg-indigo-50 text-indigo-700 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-indigo-100"
+                                            className="bg-emerald-50 text-emerald-700 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-emerald-100"
                                         >
                                             Select Video File
                                         </button>
@@ -551,60 +548,60 @@ const TutorRegistration = ({ onRegistrationSuccess }) => {
     };
 
     return (
-        <div className="max-w-5xl mx-auto py-12 px-4 mt-20">
-            <div className="text-center mb-12">
-                {/* <h2 className="text-5xl font-extrabold text-gray-900 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-                    Become a Tutor Today!
-                </h2> */}
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                    Join our platform and share your knowledge with students around the world
-                </p>
-            </div>
-            
-            {/* Progress Bar */}
-            <div className="mb-12">
-                <div className="flex items-center justify-between mb-2">
-                    {[1, 2, 3, 4, 5].map((stepNumber) => (
-                        <div 
-                            key={stepNumber} 
-                            className={`flex flex-col items-center ${step >= stepNumber ? 'text-indigo-600' : 'text-gray-400'}`}
-                        >
-                            <div className={`rounded-full w-10 h-10 flex items-center justify-center mb-2 ${
-                                step > stepNumber 
-                                    ? 'bg-green-100 text-green-600' 
-                                    : step === stepNumber 
-                                        ? 'bg-indigo-100 text-indigo-600' 
-                                        : 'bg-gray-100'
-                            }`}>
-                                {step > stepNumber ? (
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                ) : (
-                                    stepNumber
-                                )}
+        <div className="w-screen min-h-screen bg-gradient-to-b from-emerald-50 to-white mt-30">
+            <div className="max-w-5xl mx-auto py-12 px-4">
+                <div className="text-center mb-12">
+                   
+                    <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                        Join our platform and share your knowledge with students around the world
+                    </p>
+                </div>
+                
+                {/* Progress Bar */}
+                <div className="mb-12">
+                    <div className="flex items-center justify-between mb-2">
+                        {[1, 2, 3, 4, 5].map((stepNumber) => (
+                            <div 
+                                key={stepNumber} 
+                                className={`flex flex-col items-center ${step >= stepNumber ? 'text-emerald-600' : 'text-gray-400'}`}
+                            >
+                                <div className={`rounded-full w-10 h-10 flex items-center justify-center mb-2 ${
+                                    step > stepNumber 
+                                        ? 'bg-green-100 text-green-600' 
+                                        : step === stepNumber 
+                                            ? 'bg-emerald-100 text-emerald-600' 
+                                            : 'bg-gray-100'
+                                }`}>
+                                    {step > stepNumber ? (
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    ) : (
+                                        stepNumber
+                                    )}
+                                </div>
+                                <span className="text-xs font-medium">
+                                    {stepNumber === 1 && 'Personal'}
+                                    {stepNumber === 2 && 'Credentials'}
+                                    {stepNumber === 3 && 'Subjects'}
+                                    {stepNumber === 4 && 'Profile'}
+                                    {stepNumber === 5 && 'Video'}
+                                </span>
                             </div>
-                            <span className="text-xs font-medium">
-                                {stepNumber === 1 && 'Personal'}
-                                {stepNumber === 2 && 'Credentials'}
-                                {stepNumber === 3 && 'Subjects'}
-                                {stepNumber === 4 && 'Profile'}
-                                {stepNumber === 5 && 'Video'}
-                            </span>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div 
+                            className="bg-gradient-to-r from-emerald-500 to-green-600 h-2.5 rounded-full transition-all duration-500" 
+                            style={{ width: `${(step / 5) * 100}%` }}
+                        ></div>
+                    </div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div 
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 h-2.5 rounded-full transition-all duration-500" 
-                        style={{ width: `${(step / 5) * 100}%` }}
-                    ></div>
-                </div>
-            </div>
 
-            <form onSubmit={handleSubmit} className="mb-20">
-                {renderStep()}
-            </form>
+                <form onSubmit={handleSubmit} className="mb-20">
+                    {renderStep()}
+                </form>
+            </div>
         </div>
     );
 };

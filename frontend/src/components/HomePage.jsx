@@ -1,105 +1,266 @@
 // src/components/HomePage.jsx
 import React, { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Star, Quote, GraduationCap, BookOpen, Clock, Users } from 'lucide-react';
 import myPhoto from '../assets/bg41.jpeg';
-
+import tutor1 from '../assets/tutor1.jpg';
+import tutor2 from '../assets/tutor2.jpg';
+import tutor3 from '../assets/tutor3.jpg';
+import student1 from '../assets/student1.png';
+import student2 from '../assets/student2.jpg';
 
 const HomePage = ({ navigate }) => {
-const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // In a real app, you would handle the search logic here
     console.log('Searching for:', searchQuery);
   };
+
+  const tutors = [
+    {
+      id: 1,
+      name: "Mthious Assefa",
+      subject: "Mathematics",
+      experience: "10 years",
+      rating: 4.9,
+      image: tutor1
+    },
+    {
+      id: 2,
+      name: "Robel Demeke",
+      subject: "Computer Science",
+      experience: "8 years",
+      rating: 4.8,
+      image: tutor2
+    },
+    {
+      id: 3,
+      name: "Tomas Dendire",
+      subject: "English Literature",
+      experience: "5 years",
+      rating: 4.7,
+      image: tutor3
+    }
+  ];
+
+  const testimonials = [
+    {
+      id: 1,
+      name: "Shalom Dawit",
+      role: "High School Student",
+      content: "My math grades improved from C to A in just 3 months thanks to my tutor! The personalized approach made all the difference.",
+      image: student1
+    },
+    {
+      id: 2,
+      name: "Martha Solomon",
+      role: "College Student",
+      content: "The flexibility to schedule sessions around my part-time job was a game-changer. I could finally keep up with my CS coursework.",
+      image: student2
+    }
+  ];
+
+  const stats = [
+    { value: "95%", label: "Success Rate", icon: <GraduationCap size={32} /> },
+    { value: "10,000+", label: "Lessons Taught", icon: <BookOpen size={32} /> },
+    { value: "24/7", label: "Availability", icon: <Clock size={32} /> },
+    { value: "500+", label: "Expert Tutors", icon: <Users size={32} /> }
+  ];
+
   return (
-    <section className="text-center  mx-auto py-16" >
-        <img src={myPhoto} alt="My Photo"  className="absolute inset-0 bg-cover bg-center" />
-      <h2 className="text-5xl font-extrabold text-gray-800 mb-6 leading-tight">
-        Your Journey to Knowledge Starts Here 
-      </h2>
-      <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-        Connect with qualified tutors for personalized learning, or share your expertise to help students succeed.
-      </p>
+    <div className="relative w-screen">
+      {/* Hero Section */}
+      <section className="relative w-screen h-screen flex items-center justify-center text-white">
+        <div className="absolute inset-0 w-screen h-full overflow-hidden">
+          <img 
+            src={myPhoto} 
+            alt="Students learning"  
+            className="w-full h-full object-cover"
+          />
+          {/* <div className="absolute inset-0 bg-black bg-opacity-50"></div> */}
+        </div>
 
-        <section className="relative h-[100vh] flex items-center justify-center text-white">
-      {/* Background image overlay */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        // style={{ backgroundImage: "url('/images/myphoto.jpg')" }}
-      >
-        
-        {/* <div className="absolute inset-0 bg-black opacity-50"></div> */}
-      </div>
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 animate-fade-in">
+            Find Your Perfect <span className="text-emerald-400">Tutor</span>
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">
+            Personalized 1-on-1 tutoring sessions with verified experts in any subject
+          </p>
+          
+          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+            <div className="relative w-full sm:w-96">
+              <input
+                type="text"
+                placeholder="Search subjects, tutors, or topics..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full py-4 px-6 pr-12 rounded-full text-gray-800 shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500" size={24} />
+            </div>
+            <button
+              type="submit"
+              className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
+            >
+              Find Tutors
+            </button>
+          </form>
 
-      <div className="relative z-10 text-center p-4 -mt-60">
-        {/* Main heading */}
-        <h1 className="text-4xl lg:text-5xl font-extrabold mb-4 drop-shadow-lg">
-          Find Your Perfect Tutor
-        </h1>
-        {/* Search form */}
-        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-          <div className="relative w-full sm:w-80">
-            <input
-              type="text"
-              placeholder="Subjects or Keywords"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-white w-full py-3 px-5 pr-10 rounded-full text-gray-800 placeholder-gray-1000 shadow-md focus:outline-none focus:ring-2 focus:ring-black-500"
-            />
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <div className="flex flex-wrap justify-center gap-6 mt-12">
+            <button 
+              onClick={() => navigate('tutor-list')}
+              className="flex items-center gap-2 bg-white text-emerald-600 hover:bg-emerald-50 font-semibold py-3 px-6 rounded-full shadow-md transition-all"
+            >
+              <Users size={20} /> Browse Tutors
+            </button>
+            <button
+              onClick={() => navigate('tutor-register')}
+              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-full shadow-md transition-all"
+            >
+              <GraduationCap size={20} /> Teach with Us
+            </button>
           </div>
-          <button
-
-            type="submit"
-            className=" cursor-pointer bg-white text-emerald-600 hover:bg-emerald-200 text-green font-semibold py-3 px-8 rounded-full shadow-lg transition-all duration-300"
-          >
-            Search
-          </button>
-        </form>
-
-       
-        <h2 className="text-3xl lg:text-4xl font-extrabold mt-12 mb-6 drop-shadow-lg">
-          Unlock Your Potential with Personalized Tutoring
-        </h2>
-        {/* Call to action button */}
-        <button  onClick={() => navigate('AuthModal')}
-          className="cursor-pointer bg-green-600 text-white-600 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-200 transition-all duration-300">
-          Get Started
-        </button>
-      </div>
-    </section>
-
-      <div className="flex justify-center space-x-6" mx-auto>
-        
-        <button
-          onClick={() => navigate('tutor-list')} 
-          className=" cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"
-        >
-          Find a Tutor
-        </button>
-        <button
-          onClick={() => navigate('tutor-register')}
-          className=" cursor-pointer bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"
-        >
-          Become a Tutor
-        </button>
-      </div>
-      <div className="mt-16 grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-        <div className="p-6 bg-blue-50 rounded-lg shadow-inner">
-          <h3 className="text-2xl font-semibold text-blue-700 mb-3">Personalized Learning</h3>
-          <p className="text-gray-700">Get one-on-one attention tailored to your learning style and pace.</p>
         </div>
-        <div className="p-6 bg-green-50 rounded-lg shadow-inner">
-          <h3 className="text-2xl font-semibold text-green-700 mb-3">Expert Tutors</h3>
-          <p className="text-gray-700">Browse profiles of verified and highly-rated educators.</p>
+
+        <div className="absolute bottom-8 left-0 right-0 flex justify-center">
+          <div className="animate-bounce p-2 rounded-full bg-white bg-opacity-20">
+            <ChevronDown size={32} className="text-white" />
+          </div>
         </div>
-        <div className="p-6 bg-purple-50 rounded-lg shadow-inner">
-          <h3 className="text-2xl font-semibold text-purple-700 mb-3">Flexible Scheduling</h3>
-          <p className="text-gray-700">Book sessions at times that fit your busy schedule.</p>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-16 bg-gray-50 w-screen">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Why Choose Our Platform?</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                <div className="text-emerald-600 mb-4 flex justify-center">
+                  {stat.icon}
+                </div>
+                <h3 className="text-3xl font-bold text-gray-800 mb-2">{stat.value}</h3>
+                <p className="text-gray-600">{stat.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* Featured Tutors */}
+      <section className="py-16 bg-white w-screen">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Meet Our Expert Tutors</h2>
+          <p className="text-xl text-gray-600 text-center mb-12 max-w-3xl mx-auto">
+            Highly qualified professionals ready to help you achieve your academic goals
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {tutors.map(tutor => (
+              <div key={tutor.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow transform hover:-translate-y-2">
+                <div className="h-48 overflow-hidden">
+                  <img 
+                    src={tutor.image} 
+                    alt={tutor.name} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-1">{tutor.name}</h3>
+                  <p className="text-gray-600 mb-2">{tutor.subject} • {tutor.experience} experience</p>
+                  <div className="flex items-center">
+                    {[...Array(5)].map((_, i) => (
+                      <Star 
+                        key={i} 
+                        size={18} 
+                        className={`${i < Math.floor(tutor.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
+                      />
+                    ))}
+                    <span className="ml-2 text-gray-700">{tutor.rating}</span>
+                  </div>
+                  <button 
+                    onClick={() => navigate('tutor-list')}
+                    className="mt-4 w-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-medium py-2 px-4 rounded-lg transition-colors"
+                  >
+                    View Profile
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="text-center mt-12">
+            <button
+              onClick={() => navigate('tutor-list')}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all"
+            >
+              Browse All Tutors
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-16 bg-gray-50 w-screen">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">What Our Students Say</h2>
+          
+          <div className="relative bg-white rounded-xl shadow-lg p-8 md:p-12">
+            <Quote className="absolute top-6 left-6 text-gray-200" size={32} />
+            
+            <div className="text-center mb-8">
+              <img 
+                src={testimonials[activeTestimonial].image} 
+                alt={testimonials[activeTestimonial].name} 
+                className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-4 border-emerald-100"
+              />
+              <p className="text-xl italic text-gray-700 mb-4">
+                "{testimonials[activeTestimonial].content}"
+              </p>
+              <h4 className="font-bold text-lg">{testimonials[activeTestimonial].name}</h4>
+              <p className="text-gray-600">{testimonials[activeTestimonial].role}</p>
+            </div>
+            
+            <div className="flex justify-center gap-2">
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveTestimonial(index)}
+                  className={`w-3 h-3 rounded-full ${activeTestimonial === index ? 'bg-emerald-600' : 'bg-gray-300'}`}
+                  aria-label={`View testimonial ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 bg-gradient-to-r from-emerald-600 to-teal-500 text-white w-screen">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Start Learning?</h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto">
+            Join thousands of students who have achieved their academic goals with our tutors
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <button
+              onClick={() => navigate('AuthModal')}
+              className="bg-white text-emerald-600 hover:bg-gray-100 font-bold py-3 px-8 rounded-full shadow-lg transition-all"
+            >
+              Find a Tutor
+            </button>
+            <button
+              onClick={() => navigate('tutor-register')}
+              className="bg-transparent border-2 border-white hover:bg-white hover:bg-opacity-20 font-bold py-3 px-8 rounded-full shadow-lg transition-all"
+            >
+              Become a Tutor
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 };
 
